@@ -38,7 +38,7 @@
             if (items && items.length > 0) {
                 todosLosEpisodios = [];
                 
-                let defaultChannelImage = "/assets/icons/logo-192.png";
+                let defaultChannelImage = new URL("assets/icons/logo-192.png", document.baseURI).href;
                 const channelImageEl = xmlDoc.querySelector("channel > image > url");
                 if (channelImageEl) {
                     defaultChannelImage = channelImageEl.textContent;
