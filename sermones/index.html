@@ -4,38 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sermones | Pura Gracia Radio</title>
-  <meta name="description" content="Escucha sermones grabados de la Iglesia Bíblica Gracia Verdadera en Puerto Rico. Predicación expositiva y sana doctrina, disponibles online bajo demanda.>
-  <link rel="canonical" href="https://www.puragracia.com/sermones/">
-
+  <meta name="description" content="Escucha sermones grabados de la Iglesia Bíblica Gracia Verdadera en Puerto Rico. Predicación expositiva y sana doctrina, disponibles online bajo demanda.">
   <!-- PWA manifest -->
-  <link rel="manifest" href="/manifest.json">
+  <link rel="manifest" href="../manifest.json">
 
   <!-- Open Graph -->
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://www.puragracia.com/sermones/" />
-  <meta property="og:title" content="Sermones | Pura Gracia Radio" />
-  <meta property="og:description" content="Escucha sermones grabados de la Iglesia Bíblica Gracia Verdadera en Puerto Rico. Predicación expositiva y sana doctrina, disponibles online bajo demanda." />
-  <meta property="og:image" content="https://www.puragracia.com/assets/icons/logo-512.png" />
-
   <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Sermones | Pura Gracia Radio" />
-  <meta name="twitter:description" content="Escucha sermones grabados de la Iglesia Bíblica Gracia Verdadera en Puerto Rico. Predicación expositiva y sana doctrina, disponibles online bajo demanda." />
-  <meta name="twitter:image" content="https://www.puragracia.com/assets/icons/logo-512.png" />
-
   <!-- Styles -->
-  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="../css/styles.css">
 
   <!-- Redirección suave a la SPA -->
   <script>
     if (typeof window !== "undefined") {
       window.addEventListener("DOMContentLoaded", function() {
         if (!window.location.hash.includes("sermones")) {
-          window.location.replace("/#sermones");
+          window.location.replace("../#sermones");
         }
       });
     }
   </script>
+  <meta name="robots" content="noindex,nofollow">
 </head>
 <body>
   <main>
@@ -44,7 +32,7 @@
     <p>Escucha los sermones grabados de la Iglesia Bíblica Gracia Verdadera a través de nuestra PWA.</p>
 
     <!-- Enlace manual a la SPA -->
-    <p><a href="/#sermones">Escuchar sermones en la PWA</a></p>
+    <p><a href="../#sermones">Escuchar sermones en la PWA</a></p>
   </main>
 </body>
 </html>
