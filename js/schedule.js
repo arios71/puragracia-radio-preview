@@ -3,6 +3,10 @@
 // =========================
 
 const scheduleContainer = document.getElementById("scheduleContainer");
+const APP_BASE = new URL("./", document.baseURI);
+const resolveAppAsset = path => /^https?:\/\//i.test(path || "")
+  ? path
+  : new URL(String(path || "").replace(/^\/+/, ""), APP_BASE).href;
 
 let currentLiveCard = null;
 let lastFocusedCard = null;
@@ -18,13 +22,13 @@ let programsMap = {};
 
 async function loadPrograms() {
   try {
-    const res = await fetch('/data/programs.json');
+    const res = await fetch(new URL('data/programs.json', APP_BASE));
     const data = await res.json();
 
     programsMap = {};
 
     data.programs.forEach(p => {
-      programsMap[p.id] = p;
+      programsMap[p.id] = { ...p, artwork: p.artwork ? resolveAppAsset(p.artwork) : "" };
     });
 
   } catch (err) {
@@ -230,7 +234,7 @@ function runFocusEngine(force = false) {
 
 async function loadAndRenderSchedule() {
   try {
-    const res = await fetch('/data/schedule.json');
+    const res = await fetch(new URL('data/schedule.json', APP_BASE));
     const data = await res.json();
 
     renderSchedule(data);
