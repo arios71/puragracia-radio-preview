@@ -8,9 +8,9 @@ let lastActiveProgram = null;
 
 async function loadPrograms() {
     try {
-        const response = await fetch('/data/programs.json');
+        const response = await fetch(new URL('data/programs.json', APP_BASE));
         const data = await response.json();
-        programsList = data.programs;
+        programsList = data.programs.map(program => ({ ...program, artwork: program.artwork ? resolveAppAsset(program.artwork) : "" }));
         console.log("Catálogo de programas cargado:", programsList.length);
     } catch (err) {
         console.error("No se pudo cargar el catálogo de programas:", err);
@@ -120,7 +120,7 @@ async function ejecutarCompartir() {
     const shareData = {
         title: 'Pura Gracia Radio',
         text: `Estoy escuchando "${trackInfo}" en Pura Gracia Radio:`,
-        url: 'https://puragracia.com/'
+        url: window.location.href.split('#')[0]
     };
 
     try {
