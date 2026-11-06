@@ -5,26 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Programación | Pura Gracia Radio</title>
   <meta name="description" content="Consulta la programación de Pura Gracia Radio: horarios y programas en vivo 24/7.">
-  <link rel="canonical" href="https://www.puragracia.com/programacion/">
-
   <!-- PWA manifest -->
-  <link rel="manifest" href="/manifest.json">
+  <link rel="manifest" href="../manifest.json">
 
   <!-- Open Graph -->
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://www.puragracia.com/programacion/" />
-  <meta property="og:title" content="Programación | Pura Gracia Radio" />
-  <meta property="og:description" content="Consulta la programación de Pura Gracia Radio: horarios y programas en vivo 24/7." />
-  <meta property="og:image" content="https://www.puragracia.com/assets/icons/logo-512.png" />
-
   <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Programación | Pura Gracia Radio" />
-  <meta name="twitter:description" content="Consulta la programación de Pura Gracia Radio: horarios y programas en vivo 24/7." />
-  <meta name="twitter:image" content="https://www.puragracia.com/assets/icons/logo-512.png" />
-
   <!-- Styles (opcional) -->
-  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="../css/styles.css">
 
   <!-- Redirección suave a la SPA -->
   <script>
@@ -33,11 +20,12 @@
       window.addEventListener("DOMContentLoaded", function() {
         // Solo redirige si no está ya en la SPA
         if (!window.location.hash.includes("programacion")) {
-          window.location.replace("/#programacion");
+          window.location.replace("../#programacion");
         }
       });
     }
   </script>
+  <meta name="robots" content="noindex,nofollow">
 </head>
 <body>
   <main>
@@ -46,10 +34,10 @@
     <p>La programación se reproduce en vivo a través de nuestra PWA.</p>
 
     <!-- Enlace visible por si el usuario quiere abrir manualmente -->
-    <p><a href="/#programacion">Ver programación en la PWA</a></p>
+    <p><a href="../#programacion">Ver programación en la PWA</a></p>
   </main>
 
   <!-- JS específico de programación (opcional) -->
-  <script src="/js/schedule.js" defer></script>
+  <script src="../js/schedule.js" defer></script>
 </body>
 </html>
