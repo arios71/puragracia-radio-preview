@@ -44,7 +44,7 @@ self.addEventListener('fetch', event => {
   if (
     url.hostname.includes('radioboss.fm') ||
     url.hostname.includes('streamtheworld.com') ||
-    /\\.(mp3|aac|m3u8)(?:$|\\?)/i.test(url.href)
+    /\.(mp3|aac|m3u8)(?:$|\?)/i.test(url.href)
   ) return;
 
   if (event.request.method !== 'GET') return;
