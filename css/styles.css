@@ -1,0 +1,479 @@
+/* --- CONFIGURACIONES GLOBALES Y RESET --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Esta es la regla que evita el resaltado azul al tocar botones/imágenes */
+img, button, a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* --- CONFIGURACIONES GLOBALES Y RESET --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Esta es la regla que evita el resaltado azul al tocar botones/imágenes */
+img, button, a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* ... resto de tu código CSS ... */
+
+/* ================= RESET Y ESTRUCTURA APP ================= */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ================= SEO ================= */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+:root {
+  --bottom-bar-height: 80px;
+  --header-height: 80px; /* Definimos esto para consistencia */
+  --bg-color: #0a0f1a;
+}
+
+html, body {
+  height: 100dvh;
+  overflow: hidden; /* Elimina scroll global */
+  font-family: 'Segoe UI', sans-serif;
+  background: var(--bg-color);
+  color: #fff;
+}
+
+/* ================= HEADER LOGO (Ajustado) ================= */
+.logo-header {
+  height: var(--header-height);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 30px; 
+}
+
+.logo-header img {
+  height: 65px; /* Aumentamos la altura para que se vea más grande */
+  width: auto;  /* Mantiene la proporción, esto evita que se vea "ancho" o estirado */
+  max-width: 80%; /* Asegura que nunca toque los bordes laterales */
+  object-fit: contain;
+}
+
+#installTrigger {
+    background: none;
+    border: none;
+    color: #fbac33; /* Tu dorado corporativo */
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 8px;
+    margin-right: 10px; /* Separación del borde derecho */
+    transition: transform 0.2s, color 0.2s;
+}
+
+#installTrigger:hover {
+    transform: scale(1.1);
+    color: #ffffff;
+}
+
+/* ================= BOTÓN PLAY (CORREGIDO Y INTEGRADO) ================= */
+#playRadio {
+  width: 65px; 
+  height: 65px;
+  border-radius: 50%;
+  border: none;
+  background-color: #fbac33; /* Color dorado exacto */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  margin-top: 25px; /* Separación garantizada de la metadata */
+  transition: transform 0.2s, background-color 0.2s;
+  padding: 0; /* Asegura que no haya relleno extra que descentre el icono */
+}
+
+/* Ajuste preciso para que el triángulo sea proporcional al botón */
+#playRadio svg {
+  width: 35px; /* Tamaño mayor para mejor proporción */
+  height: 35px;
+  fill: #000000; /* Color inicial del triángulo (negro) */
+  display: block;
+}
+
+/* ================= CONTENEDOR PRINCIPAL (CORREGIDO) ================= */
+main.app {
+  /* Restamos la altura real del header (80px) y del menú inferior (80px) */
+  height: calc(100dvh - var(--header-height) - var(--bottom-bar-height));
+  overflow: hidden;
+  position: relative;
+}
+
+.section {
+  display: none;
+  height: 100%;
+  overflow-y: auto;
+  /* scroll-behavior: smooth; */ /* <--- ¡Coméntala así! */
+  flex-direction: column;
+  padding: 20px;
+}
+
+.section.active { display: flex; }
+
+/* ================= CARÁTULA Y PLAYER (RE-CENTRADOS) ================= */
+.player-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* <--- Cambiamos a centrado vertical */
+  padding-top: 20px; 
+  align-items: center;
+  gap: 20px; /* Un poco más de aire entre elementos */
+}
+
+.now-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.now-card img {
+  width: 280px;
+  height: 280px;
+  border-radius: 24px;
+  object-fit: cover;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* ================= METADATA (CARRUSEL HORIZONTAL) ================= */
+.now-info {
+  margin-top: 15px;
+  width: 280px; 
+  text-align: center;
+  overflow: hidden;
+}
+
+.np-meta-viewport {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Contenedor del título con el efecto carrusel */
+.marquee-container {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.marquee {
+  display: inline-block;
+  padding-left: 100%;
+  animation: marquee 10s linear infinite;
+}
+
+.np-line {
+  white-space: nowrap;
+}
+
+.title {
+  font-weight: 800;
+  color: #ffffff;
+  font-size: 1.1rem;
+}
+
+.artist {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Estilo para la nueva línea de álbum */
+.album {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 4px;
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@keyframes marquee {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-100%, 0); }
+}
+
+/* ================= MENÚ INFERIOR FIJO ================= */
+.menu-principal {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--bottom-bar-height);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: rgba(18, 18, 18, 0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 1000;
+}
+
+.menu-item {
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px; /* Espacio entre icono y texto */
+  transition: color 0.3s;
+}
+
+.menu-item i {
+  font-size: 20px; /* Tamaño del icono */
+}
+
+.menu-item span {
+  font-size: 10px; /* Tamaño del texto */
+}
+
+.menu-item.active { color: #fbac33; }
+
+/* ================= RESTO DE COMPONENTES ================= */
+.iframe-wrapper { width: 100%; height: 100%; }
+.iframe-wrapper iframe { width: 100%; height: 100%; border: 0; }
+
+/* ================= CONTACT CARDS ================= */
+.contact-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+}
+
+.contact-card {
+  width: 100%;
+  max-width: 500px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  border-radius: 18px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.contact-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.contact-text {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.contact-text a {
+  color: #fbac33;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(251, 172, 51, 0.4);
+}
+
+/* ================= PROGRAMACIÓN (RESTAURACIÓN DE DISEÑO) ================= */
+#scheduleContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  width: 100%;
+}
+
+.day-block {
+  width: 100%;
+}
+
+.day-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fbac33;
+  margin-bottom: 12px;
+  padding-left: 5px;
+}
+
+.day-row {
+  display: flex;
+  gap: 15px;
+  overflow-x: auto;
+  padding: 10px 5px;
+  /* scroll-snap-type: x mandatory; */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Ocultar scrollbar pero mantener funcionalidad */
+.day-row::-webkit-scrollbar { display: none; }
+
+.schedule-card {
+  min-width: 220px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 15px;
+  border-radius: 16px;
+  scroll-snap-align: start;
+  transition: transform 0.2s;
+  cursor: pointer;
+}
+
+.schedule-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.card-time {
+  font-size: 0.8rem;
+  color: #fbac33;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* ================= MODAL DE PROGRAMACIÓN ================= */
+#scheduleModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(5px);
+}
+
+#scheduleModal.show { display: flex; }
+
+.modal-content {
+  background: #111c2e;
+  width: 90%;
+  max-width: 400px;
+  padding: 25px;
+  border-radius: 24px;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center; /* Esto centra todo el texto dentro del modal */
+}
+
+.modal-image {
+  width: 100%;
+  aspect-ratio: 1 / 1; /* Esto fuerza la forma cuadrada 1:1 */
+  object-fit: cover;   /* Mantiene el encuadre sin deformar */
+  border-radius: 16px;
+  margin-bottom: 20px;
+}
+
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 10; /* Asegura que siempre esté encima */
+}
+
+/* Barra de scroll visible solo en escritorio para indicar que se puede mover */
+@media (min-width: 768px) {
+  .day-row::-webkit-scrollbar {
+    height: 10px;
+    display: block;
+  }
+  .day-row::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 5px;
+  }
+  .day-row::-webkit-scrollbar-thumb {
+    background: #fbac33;
+    border-radius: 5px;
+  }
+}
+
+/* ================= HIGHLIGHT PROGRAMA EN VIVO ================= */
+.schedule-card.radio-active {
+  border: 2px solid #fbac33 !important; /* Borde naranja intenso */
+  background: rgba(251, 172, 51, 0.15) !important; /* Fondo con tinte naranja */
+  box-shadow: 0 0 15px rgba(251, 172, 51, 0.3); /* Resplandor suave */
+  transform: scale(1.02); /* Un poquito más grande */
+}
+
+/* Estilo para la etiqueta EN VIVO */
+.live-badge {
+  display: inline-block;
+  background: #fbac33;
+  color: #0a0f1a;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Ajuste de margen para secciones sin título */
+#programacion, #sermones, #contacto {
+  padding-top: 40px;
+}
+
+.slogan-text {
+    font-size: 0.85em;
+    white-space: normal;
+    line-height: 1.2;
+    text-align: center;
+    padding: 2px 5px;
+}
+
+.social-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 250px;
+    transition: background 0.3s;
+    border: 1px solid rgba(251, 172, 51, 0.2);
+}
+
+.social-btn:hover {
+    background: rgba(251, 172, 51, 0.1);
+}
+
+.social-btn i {
+    font-size: 1.5rem;
+}
+
+/* Añade esto al final de tu archivo CSS */
+.now-card img:active {
+    transform: scale(0.98);
+    transition: transform 0.1s;
+    filter: brightness(0.8);
+}

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GX4KQ87HQC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-GX4KQ87HQC');
+</script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <title>Pura Gracia Radio (WRPG-DB) | Radio Cristiana 24 Horas</title>
+
+    <meta name="description" content="Pura Gracia Radio (WRPG-DB) transmite sermones en formato de predicación expositiva, programas de conversación con enseñanza cristiana, y música bíblica que expone el evangelio de Cristo, 24 horas del día." />
+
+    <meta name="theme-color" content="#121212" />
+
+    <link rel="canonical" href="https://puragracia.com/" />
+
+    <link rel="manifest" href="/manifest.json" />
+
+    <link rel="apple-touch-icon" href="/assets/icons/logo-192.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/logo-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/logo-16.png">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Pura Gracia Radio" />
+    <meta property="og:description" content="Pura Gracia Radio transmite predicaciones expositivas, enseñanza cristiana y música bíblica que expone el evangelio de Cristo." />
+    <meta property="og:url" content="https://puragracia.com/" />
+    <meta property="og:image" content="https://puragracia.com/assets/icons/logo-512.png" />
+    <meta property="og:locale" content="es_PR" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Pura Gracia Radio" />
+    <meta name="twitter:description" content="Pura Gracia transmite predicaciones expositivas, enseñanza cristiana y música bíblica." />
+    <meta name="twitter:image" content="https://puragracia.com/assets/icons/logo-512.png" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Datos estructurados -->
+    <script type="application/ld+json">
+    {
+      "@context":"https://schema.org",
+      "@type":"RadioStation",
+      "name":"Pura Gracia Radio",
+      "alternateName":"WRPG-DB",
+      "url":"https://puragracia.com/",
+      "logo":"https://puragracia.com/assets/icons/logo-512.png",
+      "description":"Radio cristiana reformada con predicación bíblica, música y enseñanza centrada en el evangelio.",
+      "publisher":{
+         "@type":"Organization",
+         "name":"Iglesia Bíblica Gracia Verdadera"
+      }
+    }
+    </script>
+
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+
+    <header class="logo-header">
+        <img src="/assets/branding/logo-horizontal.webp" alt="Pura Gracia Radio" />
+        
+        <!-- Botón discreto de instalación -->
+        <button id="installTrigger" aria-label="Instalar App" style="display:none;">
+            <i class="fas fa-download"></i>
+        </button>
+    </header>
+
+    <main class="app">
+    <h1 class="sr-only">Pura Gracia Radio - Radio Cristiana Online 24/7</h1>
+
+    <section id="inicio" class="section active">
+    <div class="player-container">
+        <div id="nowPlayingBox"></div>
+        
+        <button id="playRadio" class="btn-circular" aria-label="Reproducir/Pausar">
+            <svg id="playIcon" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"/>
+            </svg>
+        </button>
+        
+        <audio id="radioAudio" preload="none"></audio>
+    </div>
+</section>
+
+        <section id="programacion" class="section">
+            <div id="scheduleContainer"></div>
+        </section>
+
+        <section id="sermones" class="section" style="padding-bottom: 90px; padding-left: 15px; padding-right: 15px; box-sizing: border-box; overflow-x: hidden;">
+    <!-- El reproductor del sermón más reciente -->
+    <div id="main-player-container" style="margin: 20px auto; max-width: 600px; border-radius: 12px; padding: 15px; background: #1a2436; box-shadow: 0 4px 15px rgba(0,0,0,0.3); box-sizing: border-box; font-family: system-ui, sans-serif;">
+        <h4 id="custom-player-title" style="color: #ffffff; margin: 0 0 12px 0; font-size: 0.95rem; font-weight: 600; text-align: left; line-height: 1.4; word-break: break-word;">
+            Cargando sermón más reciente...
+        </h4>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button id="custom-play-btn" style="background: #fbac33; border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #121212; flex-shrink: 0;">
+                <i id="custom-play-icon" class="fas fa-play" style="font-size: 1rem; margin-left: 2px;"></i>
+            </button>
+            <div id="custom-progress-container" style="flex-grow: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; cursor: pointer; position: relative;">
+                <div id="custom-progress-bar" style="width: 0%; height: 100%; background: #fbac33; border-radius: 3px;"></div>
+            </div>
+            <span id="custom-player-time" style="color: #a0aec0; font-size: 0.75rem; min-width: 35px; text-align: right; font-variant-numeric: tabular-nums;">0:00</span>
+        </div>
+        <audio id="audioSermonPlayer" preload="metadata" crossorigin="anonymous"></audio>
+    </div>
+
+    <!-- Archivo de episodios anteriores -->
+    <div style="max-width: 600px; margin: 25px auto 15px auto;">
+        <h3 style="color: #ffffff; font-size: 1.15rem; margin: 0; font-weight: 600; border-left: 3px solid #fbac33; padding-left: 10px; font-family: system-ui, sans-serif; text-align: left;">
+            Episodios Anteriores
+        </h3>
+    </div>
+    <div id="sermons-archive-list" style="max-width: 600px; margin: 0 auto; width: 100%; box-sizing: border-box; display: flex; flex-direction: column;"></div>
+</section>
+
+        <section id="contacto" class="section">
+    <div class="contact-block">
+        <div class="contact-card">
+            <h2 class="contact-title">📬 Contacto</h2>
+            <p class="contact-text">
+                <b>Escríbenos:</b><br>
+                <a href="mailto:radio@puragracia.com">radio@puragracia.com</a>
+            </p>
+            <p class="contact-text">
+                <b>Llámanos:</b><br>
+                <a href="tel:+17872582480">(787) 258-2480</a>
+            </p>
+        </div>
+
+       <div class="contact-card">
+            <h2 class="contact-title"><i class="fas fa-users" style="color: #fbac33; margin-right: 10px;"></i> Síguenos en redes</h2>
+            <div class="social-links" style="display: flex; flex-direction: column; gap: 15px; align-items: center; margin-top: 15px;">
+                <a href="https://facebook.com/puragraciaradio" target="_blank" class="social-btn" style="text-decoration: none; color: #fff; display: flex; align-items: center; gap: 10px; padding: 12px 20px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; width: 100%; max-width: 250px; border: 1px solid rgba(251, 172, 51, 0.2);">
+                    <i class="fab fa-facebook" style="color: #1877f2; font-size: 1.5rem;"></i> 
+                    <span>Facebook</span>
+                </a>
+                <a href="https://whatsapp.com/channel/0029VaAFdiO60eBjjXuyei1U" target="_blank" class="social-btn" style="text-decoration: none; color: #fff; display: flex; align-items: center; gap: 10px; padding: 12px 20px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; width: 100%; max-width: 250px; border: 1px solid rgba(251, 172, 51, 0.2);">
+                    <i class="fab fa-whatsapp" style="color: #25d366; font-size: 1.5rem;"></i> 
+                    <span>Canal de WhatsApp</span>
+                </a>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+    <button id="btnCompartirDinamico" style="background: transparent; border: 1px solid #fbac33; color: #fbac33; padding: 8px 16px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+        <i class="fas fa-share-alt"></i> Compartir lo que escucho
+    </button>
+</div>
+        <p class="contact-footer">© 2026 Iglesia Bíblica Gracia Verdadera</p>
+    </div>
+</section>
+
+    </main>
+
+    <nav class="menu-principal">
+  <a href="#" data-section="inicio" class="menu-item active">
+    <i class="fas fa-home"></i>
+    <span>Inicio</span>
+  </a>
+  <a href="#" data-section="programacion" class="menu-item">
+    <i class="fas fa-calendar-alt"></i>
+    <span>Prog.</span>
+  </a>
+  <a href="#" data-section="sermones" class="menu-item">
+    <i class="fas fa-microphone-lines"></i>
+    <span>Sermones</span>
+  </a>
+  <a href="#" data-section="contacto" class="menu-item">
+    <i class="fas fa-envelope"></i>
+    <span>Contacto</span>
+  </a>
+</nav>
+
+    <script src="/js/schedule.js"></script>
+    <script src="/js/radio.js"></script>
+    <script src="/js/menu.js"></script>
+    <script src="/js/nowplaying.js"></script>
+    <script src="/js/sermones.js"></script>
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .catch(err => console.log('PWA: Error registrando SW', err));
+        });
+      }
+    </script>
+</body>
+</html>

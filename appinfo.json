@@ -1,0 +1,10 @@
+{
+  "id": "com.puragracia.radio",
+  "version": "1.0.0",
+  "vendor": "Pura Gracia Radio",
+  "type": "web",
+  "main": "index.html",
+  "uiRevision": 2,
+  "appDescription": "Reproductor oficial de Pura Gracia Radio",
+  "icon": "assets/icons/logo-512.png"
+}

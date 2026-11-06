@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pura Gracia Radio - Mini</title>
+
+<link rel="icon" type="image/png"
+href="https://raw.githubusercontent.com/arios71/puragracia.com/refs/heads/main/assets/logo-512.png">
+
+<style>
+:root{
+  --bg:#121212;
+  --card:#1e1e1e;
+  --green:#4CAF50;
+  --gold:#fbac33;
+  --white:#ffffff;
+}
+
+html, body{
+  margin:0;
+  padding:0;
+  font-family:system-ui, sans-serif;
+  background:var(--bg);
+  color:var(--white);
+}
+
+.mini-widget{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  background:var(--card);
+  border-radius:20px;
+  padding:6px 12px;
+  max-width:400px;
+  margin:0 auto;
+  box-shadow:0 8px 20px rgba(0,0,0,.3);
+  font-size:0.9rem;
+}
+
+.mini-logo{
+  width:40px;
+  height:40px;
+  margin-right:10px;
+  border-radius:8px;
+}
+
+.mini-info{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  overflow:hidden;
+}
+
+.mini-info .title{
+  font-weight:700;
+}
+
+.mini-info .title span{
+  font-style:italic;
+  color:var(--gold);
+}
+
+.mini-info .subtitle{
+  font-size:0.75rem;
+  opacity:0.7;
+  line-height:1;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.mini-player{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.mini-player button{
+  background:var(--green);
+  border:none;
+  color:#fff;
+  border-radius:16px;
+  padding:6px 12px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.mini-waves{
+  display:flex;
+  align-items:flex-end;
+  gap:2px;
+  height:16px;
+}
+
+.mini-wave{
+  width:2px;
+  background:var(--green);
+  animation:miniWave 0.8s infinite ease-in-out;
+}
+
+.mini-wave:nth-child(1){animation-delay:0s;}
+.mini-wave:nth-child(2){animation-delay:0.1s;}
+.mini-wave:nth-child(3){animation-delay:0.2s;}
+.mini-wave:nth-child(4){animation-delay:0.3s;}
+.mini-wave:nth-child(5){animation-delay:0.4s;}
+
+@keyframes miniWave{
+  0%,100%{height:4px;}
+  50%{height:16px;}
+}
+
+audio{display:none;}
+</style>
+</head>
+
+<body>
+
+<div class="mini-widget">
+
+  <img class="mini-logo"
+       src="https://raw.githubusercontent.com/arios71/puragracia.com/refs/heads/main/assets/logo-512.png"
+       alt="Pura Gracia Radio">
+
+  <div class="mini-info">
+    <div class="title">Pura Gracia <span>Radio</span></div>
+    <div class="subtitle">WRPG-DB</div>
+  </div>
+
+  <div class="mini-player">
+    <button id="miniPlayBtn">▶</button>
+    <div class="mini-waves">
+      <div class="mini-wave"></div>
+      <div class="mini-wave"></div>
+      <div class="mini-wave"></div>
+      <div class="mini-wave"></div>
+      <div class="mini-wave"></div>
+    </div>
+  </div>
+
+  <audio id="miniAudio" preload="none">
+    <source src="https://playerservices.streamtheworld.com/api/livestream-redirect/SAM05AAC459_SC" type="audio/mpeg">
+  </audio>
+
+</div>
+
+<script>
+const btn = document.getElementById('miniPlayBtn');
+const audio = document.getElementById('miniAudio');
+const waves = document.querySelectorAll('.mini-wave');
+
+waves.forEach(w => w.style.animationPlayState='paused');
+
+btn.addEventListener('click', async ()=>{
+  try{
+    if(audio.paused){
+      await audio.play();
+      btn.textContent='⏸';
+      waves.forEach(w=>w.style.animationPlayState='running');
+    }else{
+      audio.pause();
+      btn.textContent='▶';
+      waves.forEach(w=>w.style.animationPlayState='paused');
+    }
+  }catch(e){
+    alert('No se pudo reproducir el audio.');
+  }
+});
+</script>
+
+</body>
+</html>

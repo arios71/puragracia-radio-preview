@@ -1,0 +1,18 @@
+# robots.txt definitivo para Pura Gracia PWA
+
+# Todos los bots
+User-agent: *
+
+# Permitimos rastrear todo el sitio
+Allow: /
+
+# No bloqueamos CSS ni JS, necesarios para la SPA/PWA
+# No bloqueamos imágenes, iconos ni fuentes, ya que Google puede indexarlas
+
+# Sitemap oficial
+Sitemap: https://www.puragracia.com/sitemap.xml
+
+# Notas:
+# 1. Las secciones de la PWA ahora tienen URLs reales:
+#    /programacion/, /sermones/, /contacto/
+# 2. Google podrá rastrear el contenido de la SPA desde estas URLs y desde la homepage.
