@@ -45,7 +45,7 @@ const audio = document.getElementById('radioAudio');
 const body = document.body;
 const radioStatus = document.getElementById('radioStatus');
 
-const STREAM_URL = "https://playerservices.streamtheworld.com/api/livestream-redirect/SAM05AAC459_SC";
+const STREAM_URL = "https://c23.radioboss.fm/stream/296";
 
 // Estado interno
 let isPlaying = false;
