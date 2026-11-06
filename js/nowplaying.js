@@ -1,6 +1,10 @@
 // js/nowplaying.js
 const nowPlayingBox = document.getElementById("nowPlayingBox");
-const DEFAULT_COVER = "/default-cover.png";
+const APP_BASE = new URL("./", document.baseURI);
+const resolveAppAsset = path => /^https?:\/\//i.test(path || "")
+    ? path
+    : new URL(String(path || "").replace(/^\/+/, ""), APP_BASE).href;
+const DEFAULT_COVER = new URL("default-cover.png", APP_BASE).href;
 const SLOGAN = "Música y contenido en sintonía con el evangelio de Cristo"; 
 let currentTrack = null;
 let programsList = [];
