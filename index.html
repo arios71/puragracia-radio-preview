@@ -1,14 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GX4KQ87HQC"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-GX4KQ87HQC');
-</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
@@ -17,54 +9,16 @@
     <meta name="description" content="Pura Gracia Radio (WRPG-DB) transmite sermones en formato de predicación expositiva, programas de conversación con enseñanza cristiana, y música bíblica que expone el evangelio de Cristo, 24 horas del día." />
 
     <meta name="theme-color" content="#121212" />
+    <meta name="robots" content="noindex,nofollow" /><link rel="manifest" href="./manifest.json" />
 
-    <link rel="canonical" href="https://puragracia.com/" />
-
-    <link rel="manifest" href="/manifest.json" />
-
-    <link rel="apple-touch-icon" href="/assets/icons/logo-192.png" />
+    <link rel="apple-touch-icon" href="./assets/icons/logo-192.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/logo-32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/logo-16.png">
-
-    <!-- Open Graph -->
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Pura Gracia Radio" />
-    <meta property="og:description" content="Pura Gracia Radio transmite predicaciones expositivas, enseñanza cristiana y música bíblica que expone el evangelio de Cristo." />
-    <meta property="og:url" content="https://puragracia.com/" />
-    <meta property="og:image" content="https://puragracia.com/assets/icons/logo-512.png" />
-    <meta property="og:locale" content="es_PR" />
-
-    <!-- Twitter / X -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Pura Gracia Radio" />
-    <meta name="twitter:description" content="Pura Gracia transmite predicaciones expositivas, enseñanza cristiana y música bíblica." />
-    <meta name="twitter:image" content="https://puragracia.com/assets/icons/logo-512.png" />
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Datos estructurados -->
-    <script type="application/ld+json">
-    {
-      "@context":"https://schema.org",
-      "@type":"RadioStation",
-      "name":"Pura Gracia Radio",
-      "alternateName":"WRPG-DB",
-      "url":"https://puragracia.com/",
-      "logo":"https://puragracia.com/assets/icons/logo-512.png",
-      "description":"Radio cristiana reformada con predicación bíblica, música y enseñanza centrada en el evangelio.",
-      "publisher":{
-         "@type":"Organization",
-         "name":"Iglesia Bíblica Gracia Verdadera"
-      }
-    }
-    </script>
-
-    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/logo-16.png"><link rel="stylesheet" href="./css/styles.css" />
 </head>
 <body>
 
     <header class="logo-header">
-        <img src="/assets/branding/logo-horizontal.webp" alt="Pura Gracia Radio" />
+        <img src="./assets/branding/logo-horizontal.webp" alt="Pura Gracia Radio" />
         
         <!-- Botón discreto de instalación -->
         <button id="installTrigger" aria-label="Instalar App" style="display:none;">
@@ -178,16 +132,16 @@
   </a>
 </nav>
 
-    <script src="/js/schedule.js"></script>
-    <script src="/js/radio.js"></script>
-    <script src="/js/menu.js"></script>
-    <script src="/js/nowplaying.js"></script>
-    <script src="/js/sermones.js"></script>
+    <script src="./js/schedule.js"></script>
+    <script src="./js/radio.js"></script>
+    <script src="./js/menu.js"></script>
+    <script src="./js/nowplaying.js"></script>
+    <script src="./js/sermones.js"></script>
 
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
+          navigator.serviceWorker.register('./sw.js', { scope: './' })
             .catch(err => console.log('PWA: Error registrando SW', err));
         });
       }
