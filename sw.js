@@ -1,104 +1,71 @@
-const CACHE_NAME = 'pgr-v57';
-
-// Archivos estáticos principales
+const CACHE_NAME = 'pgr-preview-v1';
+const APP_BASE = new URL('./', self.location.href);
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/css/styles.css',
-  '/js/radio.js',
-  '/js/menu.js',
-  '/js/nowplaying.js',
-  '/js/schedule.js',
-  '/manifest.json',
-  '/assets/icons/logo-32.png',
-  '/assets/icons/logo-192.png',
-  '/assets/icons/logo-512.png',
-  '/assets/icons/icon-maskable-512.png',
-  '/assets/icons/apple-touch-icon.png',
-  '/assets/icons/whatsapp.png'
-];
+  '',
+  'index.html',
+  'css/styles.css',
+  'js/radio.js',
+  'js/menu.js',
+  'js/nowplaying.js',
+  'js/schedule.js',
+  'js/sermones.js',
+  'manifest.json',
+  'assets/branding/logo-horizontal.webp',
+  'assets/icons/logo-32.png',
+  'assets/icons/logo-192.png',
+  'assets/icons/logo-512.png',
+  'assets/icons/icon-maskable-512.png',
+  'assets/icons/apple-touch-icon.png',
+  'assets/icons/whatsapp.png'
+].map(path => new URL(path, APP_BASE).href);
 
-// =========================
-// INSTALL
-// =========================
 self.addEventListener('install', event => {
   self.skipWaiting();
-
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(STATIC_ASSETS))
-      .catch(err => {
-        console.error('Cache addAll failed:', err);
-      })
+      .catch(err => console.error('No se pudo completar el caché inicial:', err))
   );
 });
 
-// =========================
-// ACTIVATE
-// =========================
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cache => {
-          if (cache !== CACHE_NAME) {
-            return caches.delete(cache);
-          }
-        })
-      );
-    }).then(() => self.clients.claim())
+    caches.keys().then(names => Promise.all(
+      names.filter(name => name.startsWith('pgr-preview-') && name !== CACHE_NAME)
+        .map(name => caches.delete(name))
+    )).then(() => self.clients.claim())
   );
 });
 
-// =========================
-// FETCH (SPA STRATEGY)
-// =========================
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // 🔴 NO cachear streaming ni audio en vivo
+  // No interceptar transmisiones de audio en vivo.
   if (
+    url.hostname.includes('radioboss.fm') ||
     url.hostname.includes('streamtheworld.com') ||
-    url.pathname.includes('.mp3') ||
-    url.pathname.includes('.aac') ||
-    url.pathname.includes('.m3u8')
-  ) {
-    return;
-  }
+    /\\.(mp3|aac|m3u8)(?:$|\\?)/i.test(url.href)
+  ) return;
 
-  // 🟢 NAVIGATION REQUESTS (SPA fallback)
+  if (event.request.method !== 'GET') return;
+
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request)
-        .then(response => {
-          return response;
-        })
-        .catch(() => {
-          return caches.match('/index.html');
-        })
+      fetch(event.request).catch(() => caches.match(new URL('index.html', APP_BASE).href))
     );
     return;
   }
 
-  // 🟢 STATIC ASSETS → cache first, then network
   event.respondWith(
-    caches.match(event.request).then(cachedResponse => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-
-      return fetch(event.request).then(networkResponse => {
-        // ✅ SOLO cacheamos si es una petición GET (y no Analytics)
-        if (event.request.method === 'GET' && 
-            !event.request.url.includes('google-analytics') && 
-            !event.request.url.includes('googletagmanager')) {
-          
-          return caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, networkResponse.clone());
-            return networkResponse;
-          });
+    caches.match(event.request).then(cached => {
+      if (cached) return cached;
+      return fetch(event.request).then(response => {
+        if (response.ok && url.origin === self.location.origin &&
+            url.pathname.startsWith(APP_BASE.pathname)) {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
         }
-        return networkResponse;
+        return response;
       });
     })
   );
