@@ -1,6 +1,7 @@
 // js/nowplaying.js
 const nowPlayingBox = document.getElementById("nowPlayingBox");
-const DEFAULT_COVER = new URL("default-cover.png", APP_BASE).href;
+const NOWPLAYING_APP_BASE = new URL("./", document.baseURI);
+const DEFAULT_COVER = new URL("default-cover.png", NOWPLAYING_APP_BASE).href;
 const SLOGAN = "Música y contenido en sintonía con el evangelio de Cristo";
 const NOWPLAYING_URL = "https://pg-radio-webhook-ji26cdibb-antolins-projects-3931f532.vercel.app/api/radioboss-nowplaying";
 let currentTrack = null;
@@ -11,7 +12,7 @@ const asText = value => typeof value === "string" ? value.trim() : (value == nul
 
 async function loadNowPlayingPrograms() {
     try {
-        const response = await fetch(new URL("data/programs.json", APP_BASE));
+        const response = await fetch(new URL("data/programs.json", NOWPLAYING_APP_BASE));
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = await response.json();
         programsList = (Array.isArray(data.programs) ? data.programs : [])
