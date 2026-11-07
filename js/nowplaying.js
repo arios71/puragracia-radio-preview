@@ -1,10 +1,6 @@
 // js/nowplaying.js
 const nowPlayingBox = document.getElementById("nowPlayingBox");
-const APP_BASE = new URL("./", document.baseURI);
-const resolveAppAsset = path => /^https?:\/\//i.test(path || "")
-    ? path
-    : new URL(String(path || "").replace(/^\/+/, ""), APP_BASE).href;
-const DEFAULT_COVER = new URL("assets/branding/default-cover.png", APP_BASE).href;
+const DEFAULT_COVER = new URL("default-cover.png", APP_BASE).href;
 const SLOGAN = "Música y contenido en sintonía con el evangelio de Cristo";
 const NOWPLAYING_URL = "https://pg-radio-webhook-ji26cdibb-antolins-projects-3931f532.vercel.app/api/radioboss-nowplaying";
 let currentTrack = null;
@@ -13,7 +9,7 @@ let lastActiveProgram = null;
 
 const asText = value => typeof value === "string" ? value.trim() : (value == null ? "" : String(value).trim());
 
-async function loadPrograms() {
+async function loadNowPlayingPrograms() {
     try {
         const response = await fetch(new URL("data/programs.json", APP_BASE));
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -121,7 +117,7 @@ async function fetchNowPlaying() {
     }
 }
 
-loadPrograms().finally(fetchNowPlaying);
+loadNowPlayingPrograms().finally(fetchNowPlaying);
 setInterval(fetchNowPlaying, 15000);
 
 async function ejecutarCompartir() {
