@@ -11,7 +11,7 @@ const STATIC_ASSETS = [
   'js/sermones.js',
   'manifest.json',
   'assets/branding/logo-horizontal.webp',
-  'assets/branding/default-cover.png',
+  'default-cover.png',
   'assets/icons/logo-32.png',
   'assets/icons/logo-192.png',
   'assets/icons/logo-512.png',
