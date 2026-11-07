@@ -185,12 +185,9 @@ function focusCard(card) {
 
   const section = document.getElementById('programacion');
 
-  // Protección: Si el contenedor no tiene altura, reintentamos en 500ms
-  if (!section || section.offsetHeight === 0) {
-    console.log("DEBUG: Contenedor no listo, reintentando...");
-    setTimeout(() => focusCard(card), 500);
-    return;
-  }
+  // La sección puede estar oculta mientras el usuario está en Inicio.
+  // No intentamos desplazarla; el enfoque se ejecuta al abrir Programación.
+  if (!section || section.offsetHeight === 0) return;
 
   console.log("DEBUG: Intentando hacer scroll a:", card.innerText);
 
@@ -369,6 +366,21 @@ async function init() {
 }
 
 init();
+
+// Al abrir Programación, ejecutamos el enfoque cuando la sección ya es visible.
+const programacionSection = document.getElementById("programacion");
+if (programacionSection) {
+  const programacionObserver = new MutationObserver(() => {
+    if (programacionSection.classList.contains("active")) {
+      updateLiveStatus();
+      runFocusEngine(true);
+    }
+  });
+  programacionObserver.observe(programacionSection, {
+    attributes: true,
+    attributeFilter: ["class"]
+  });
+}
 
 ["scroll", "touchstart", "wheel"].forEach(evt => {
   window.addEventListener(evt, () => {
