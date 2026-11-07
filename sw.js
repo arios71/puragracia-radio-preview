@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pgr-preview-v1';
+const CACHE_NAME = 'pgr-preview-v2';
 const APP_BASE = new URL('./', self.location.href);
 const STATIC_ASSETS = [
   '',
@@ -11,6 +11,7 @@ const STATIC_ASSETS = [
   'js/sermones.js',
   'manifest.json',
   'assets/branding/logo-horizontal.webp',
+  'assets/branding/default-cover.png',
   'assets/icons/logo-32.png',
   'assets/icons/logo-192.png',
   'assets/icons/logo-512.png',
@@ -40,10 +41,10 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // No interceptar transmisiones de audio en vivo.
   if (
     url.hostname.includes('radioboss.fm') ||
     url.hostname.includes('streamtheworld.com') ||
+    url.hostname.includes('vercel.app') ||
     /\.(mp3|aac|m3u8)(?:$|\?)/i.test(url.href)
   ) return;
 
