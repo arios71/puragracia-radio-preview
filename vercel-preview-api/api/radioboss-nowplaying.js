@@ -1,85 +1,184 @@
-const ALLOWED_ORIGINS = new Set([
-  "https://arios71.github.io"
-]);
 
-function setCors(req, res) {
-  const origin = req.headers.origin;
+// js/nowplaying.js
+const nowPlayingBox = document.getElementById("nowPlayingBox");
+const NOWPLAYING_APP_BASE = new URL("./", document.baseURI);
+const resolveNowPlayingAsset = path => /^https?:\/\//i.test(path || "")
+    ? path
+    : new URL(String(path || "").replace(/^\/+/, ""), NOWPLAYING_APP_BASE).href;
+const DEFAULT_COVER = new URL("default-cover.png", NOWPLAYING_APP_BASE).href;
+const SLOGAN = "Música y contenido en sintonía con el evangelio de Cristo";
+const NOWPLAYING_URL = "https://puragracia-radio-preview-vercel-pre.vercel.app/api/radioboss-nowplaying";
+let currentTrack = null;
+let programsList = [];
+let lastActiveProgram = null;
 
-  if (origin && ALLOWED_ORIGINS.has(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-    res.setHeader("Vary", "Origin");
-  }
+const asText = value => typeof value === "string" ? value.trim() : (value == null ? "" : String(value).trim());
 
-  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  res.setHeader("Access-Control-Max-Age", "86400");
+async function loadNowPlayingPrograms() {
+    try {
+        const response = await fetch(new URL("data/programs.json", NOWPLAYING_APP_BASE));
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        programsList = (Array.isArray(data.programs) ? data.programs : [])
+            .map(program => ({ ...program, artwork: program.artwork ? resolveNowPlayingAsset(program.artwork) : "" }));
+        console.log("Catálogo de programas cargado:", programsList.length);
+    } catch (err) {
+        console.error("No se pudo cargar el catálogo de programas:", err);
+    }
 }
 
-module.exports = async function handler(req, res) {
-  setCors(req, res);
-  res.setHeader("Cache-Control", "no-store, max-age=0");
-
-  if (req.method === "OPTIONS") {
-    return res.status(204).end();
-  }
-
-  if (req.method !== "GET") {
-    res.setHeader("Allow", "GET, OPTIONS");
-    return res.status(405).json({ ok: false, error: "Method not allowed" });
-  }
-
-  const apiUrl = process.env.RADIOBOSS_API_URL;
-  const apiKey = process.env.RADIOBOSS_API_KEY;
-
-  if (!apiUrl || !apiKey) {
-    return res.status(500).json({
-      ok: false,
-      error: "RadioBOSS API environment variables are not configured"
-    });
-  }
-
-  try {
-    const upstreamUrl = new URL(apiUrl);
-    upstreamUrl.searchParams.set("key", apiKey);
-
-    const upstream = await fetch(upstreamUrl.toString(), {
-      method: "GET",
-      headers: { Accept: "application/json" },
-      cache: "no-store",
-      signal: AbortSignal.timeout(10000)
-    });
-
-    if (!upstream.ok) {
-      return res.status(502).json({
-        ok: false,
-        error: "RadioBOSS API request failed",
-        upstreamStatus: upstream.status
-      });
+function updateNowPlaying(metadata) {
+    if (!nowPlayingBox) {
+        console.error("No existe #nowPlayingBox en el documento.");
+        return;
     }
 
-    const payload = await upstream.json();
-    const attributes = payload?.currenttrack_info?.["@attributes"] || {};
-    const artwork = payload?.links?.artwork || "";
+    // No sustituir la metadata visible mientras suena un elemento de producción.
+    // Se conserva también la carátula que ya estaba mostrándose.
+    if (metadata?.isProduction) {
+        if (currentTrack !== null) {
+            console.log("Elemento de producción: se conserva la metadata anterior.");
+            return;
+        }
 
-    let coverArt = "";
-    if (typeof artwork === "string" && artwork) {
-      coverArt = new URL(artwork, upstreamUrl.origin).toString();
+        // Si la PWA se abre mientras suena producción, no mostrar el nombre del archivo.
+        metadata = {
+            title: "Pura Gracia Radio",
+            artist: SLOGAN,
+            album: "",
+            coverArt: ""
+        };
     }
 
-    return res.status(200).json({
-      ok: true,
-      station: "Pura Gracia Radio",
-      nowPlaying: {
-        artist: attributes.ARTIST || "",
-        title: attributes.TITLE || "",
-        album: attributes.ALBUM || "",
-        coverArt
-      }
-    });
-  } catch (error) {
-    return res.status(502).json({
-      ok: false,
-      error: "Unable to retrieve RadioBOSS metadata"
-    });
-  }
-};
+    let title = asText(metadata?.title) || "Pura Gracia Radio";
+    const rawArtist = asText(metadata?.artist);
+    const album = asText(metadata?.album);
+    const artist = (title === "Pura Gracia Radio" || !rawArtist) ? SLOGAN : rawArtist;
+
+    let prog = programsList.find(p =>
+        title.toLowerCase().includes(asText(p.name).toLowerCase()) ||
+        asText(p.name).toLowerCase().includes(title.toLowerCase()) ||
+        (album && album.toLowerCase().includes(asText(p.name).toLowerCase())) ||
+        (album && asText(p.name).toLowerCase().includes(album.toLowerCase()))
+    );
+
+    if (!prog && title === "Pura Gracia Radio" && lastActiveProgram) {
+        prog = lastActiveProgram;
+        title = prog.name;
+    } else if (prog) {
+        lastActiveProgram = prog;
+    } else if (title === "Pura Gracia Radio") {
+        lastActiveProgram = null;
+    }
+
+    const coverArt = asText(metadata?.coverArt) || (prog?.artwork || DEFAULT_COVER);
+    const newTrackId = `${title}_${artist}_${album}_${coverArt}`.toLowerCase();
+
+    // RadioBOSS puede reutilizar la misma URL de artwork para canciones distintas.
+    // Añadimos una versión nueva solo cuando cambia la pista, para evitar la caché
+    // del navegador sin volver a descargar la portada en cada consulta de 15 s.
+    let displayCoverArt = coverArt;
+    if (coverArt !== DEFAULT_COVER) {
+        try {
+            const versionedCover = new URL(coverArt, document.baseURI);
+            versionedCover.searchParams.set("v", String(Date.now()));
+            displayCoverArt = versionedCover.href;
+        } catch (_) {
+            displayCoverArt = coverArt;
+        }
+    }
+
+    let card = nowPlayingBox.querySelector(".now-card");
+    if (!card) {
+        card = document.createElement("div");
+        card.className = "now-card";
+        nowPlayingBox.appendChild(card);
+    }
+
+    if (currentTrack === newTrackId && card.querySelector("img") && card.querySelector(".now-info")) return;
+    currentTrack = newTrackId;
+
+    let coverImg = card.querySelector("img");
+    if (!coverImg) {
+        coverImg = document.createElement("img");
+        card.prepend(coverImg);
+    }
+    coverImg.onerror = () => {
+        if (coverImg.src !== DEFAULT_COVER) coverImg.src = DEFAULT_COVER;
+    };
+    coverImg.src = displayCoverArt;
+    coverImg.alt = "Carátula de lo que está sonando";
+    coverImg.style.cursor = "pointer";
+    coverImg.onclick = ejecutarCompartir;
+
+    let infoDiv = card.querySelector(".now-info");
+    if (!infoDiv) {
+        infoDiv = document.createElement("div");
+        infoDiv.className = "now-info";
+        card.appendChild(infoDiv);
+    }
+
+    const isSlogan = artist === SLOGAN;
+    infoDiv.innerHTML = `
+        <div class="np-meta-viewport">
+            <div class="marquee-container"><div class="np-line title marquee">${title}</div></div>
+            <div class="np-line artist ${isSlogan ? "slogan-text" : ""}">${artist}</div>
+            ${album ? `<div class="np-line album">${album}</div>` : ""}
+        </div>
+    `;
+
+    if ("mediaSession" in navigator && "MediaMetadata" in window) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title, artist, album,
+            artwork: [{ src: displayCoverArt, sizes: "512x512", type: "image/jpeg" }]
+        });
+    }
+}
+
+async function fetchNowPlaying() {
+    try {
+        const res = await fetch(`${NOWPLAYING_URL}?cb=${Date.now()}`, { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        // La API de RadioBOSS entrega los campos dentro de data.nowPlaying.
+        // También aceptamos respuestas planas para mantener compatibilidad.
+        const metadata = data?.nowPlaying || data?.data?.nowPlaying || data?.data || data;
+        if (!metadata || typeof metadata !== "object") throw new Error("Respuesta de metadata vacía");
+        console.log("Metadata RadioBOSS recibida:", metadata);
+        updateNowPlaying(metadata);
+    } catch (err) {
+        console.error("No se pudo obtener metadata de RadioBOSS:", err);
+        updateNowPlaying({ title: "Pura Gracia Radio" });
+    }
+}
+
+loadNowPlayingPrograms().finally(fetchNowPlaying);
+setInterval(fetchNowPlaying, 15000);
+
+async function ejecutarCompartir() {
+    const title = document.querySelector(".np-line.title")?.innerText || "Programación";
+    const artist = document.querySelector(".np-line.artist")?.innerText || "";
+    const trackInfo = artist ? `${title} - ${artist}` : title;
+    const shareData = {
+        title: "Pura Gracia Radio",
+        text: `Estoy escuchando "${trackInfo}" en Pura Gracia Radio:`,
+        url: window.location.href.split("#")[0]
+    };
+
+    try {
+        if (navigator.share) {
+            await navigator.share(shareData);
+        } else {
+            await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
+            alert("Enlace copiado al portapapeles");
+        }
+    } catch (err) {
+        console.log("Error al compartir:", err);
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const btnCompartir = document.getElementById("btnCompartirDinamico");
+    if (btnCompartir) btnCompartir.addEventListener("click", ejecutarCompartir);
+});
