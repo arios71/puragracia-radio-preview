@@ -3,10 +3,10 @@
 // =========================
 
 const scheduleContainer = document.getElementById("scheduleContainer");
-const APP_BASE = new URL("./", document.baseURI);
-const resolveAppAsset = path => /^https?:\/\//i.test(path || "")
+const SCHEDULE_APP_BASE = new URL("./", document.baseURI);
+const resolveScheduleAsset = path => /^https?:\/\//i.test(path || "")
   ? path
-  : new URL(String(path || "").replace(/^\/+/, ""), APP_BASE).href;
+  : new URL(String(path || "").replace(/^\/+/, ""), SCHEDULE_APP_BASE).href;
 
 let currentLiveCard = null;
 let lastFocusedCard = null;
@@ -22,13 +22,13 @@ let programsMap = {};
 
 async function loadPrograms() {
   try {
-    const res = await fetch(new URL('data/programs.json', APP_BASE));
+    const res = await fetch(new URL('data/programs.json', SCHEDULE_APP_BASE));
     const data = await res.json();
 
     programsMap = {};
 
     data.programs.forEach(p => {
-      programsMap[p.id] = { ...p, artwork: p.artwork ? resolveAppAsset(p.artwork) : "" };
+      programsMap[p.id] = { ...p, artwork: p.artwork ? resolveScheduleAsset(p.artwork) : "" };
     });
 
   } catch (err) {
@@ -234,7 +234,7 @@ function runFocusEngine(force = false) {
 
 async function loadAndRenderSchedule() {
   try {
-    const res = await fetch(new URL('data/schedule.json', APP_BASE));
+    const res = await fetch(new URL('data/schedule.json', SCHEDULE_APP_BASE));
     const data = await res.json();
 
     renderSchedule(data);
