@@ -56,6 +56,20 @@ function updateNowPlaying(metadata) {
     const coverArt = asText(metadata?.coverArt) || (prog?.artwork || DEFAULT_COVER);
     const newTrackId = `${title}_${artist}_${album}_${coverArt}`.toLowerCase();
 
+    // RadioBOSS puede reutilizar la misma URL de artwork para canciones distintas.
+    // Añadimos una versión nueva solo cuando cambia la pista, para evitar la caché
+    // del navegador sin volver a descargar la portada en cada consulta de 15 s.
+    let displayCoverArt = coverArt;
+    if (coverArt !== DEFAULT_COVER) {
+        try {
+            const versionedCover = new URL(coverArt, document.baseURI);
+            versionedCover.searchParams.set("v", String(Date.now()));
+            displayCoverArt = versionedCover.href;
+        } catch (_) {
+            displayCoverArt = coverArt;
+        }
+    }
+
     let card = nowPlayingBox.querySelector(".now-card");
     if (!card) {
         card = document.createElement("div");
@@ -74,7 +88,7 @@ function updateNowPlaying(metadata) {
     coverImg.onerror = () => {
         if (coverImg.src !== DEFAULT_COVER) coverImg.src = DEFAULT_COVER;
     };
-    coverImg.src = coverArt;
+    coverImg.src = displayCoverArt;
     coverImg.alt = "Carátula de lo que está sonando";
     coverImg.style.cursor = "pointer";
     coverImg.onclick = ejecutarCompartir;
@@ -98,7 +112,7 @@ function updateNowPlaying(metadata) {
     if ("mediaSession" in navigator && "MediaMetadata" in window) {
         navigator.mediaSession.metadata = new MediaMetadata({
             title, artist, album,
-            artwork: [{ src: coverArt, sizes: "512x512", type: "image/jpeg" }]
+            artwork: [{ src: displayCoverArt, sizes: "512x512", type: "image/jpeg" }]
         });
     }
 }
