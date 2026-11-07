@@ -1,5 +1,4 @@
 const ALLOWED_ORIGINS = new Set([
-  "https://arios71.github.io",
   "https://arios71.github.io"
 ]);
 
