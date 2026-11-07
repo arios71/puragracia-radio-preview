@@ -1,6 +1,9 @@
 // js/nowplaying.js
 const nowPlayingBox = document.getElementById("nowPlayingBox");
 const NOWPLAYING_APP_BASE = new URL("./", document.baseURI);
+const resolveNowPlayingAsset = path => /^https?:\/\//i.test(path || "")
+    ? path
+    : new URL(String(path || "").replace(/^\/+/, ""), NOWPLAYING_APP_BASE).href;
 const DEFAULT_COVER = new URL("default-cover.png", NOWPLAYING_APP_BASE).href;
 const SLOGAN = "Música y contenido en sintonía con el evangelio de Cristo";
 const NOWPLAYING_URL = "https://puragracia-radio-preview-vercel-pre.vercel.app/api/radioboss-nowplaying";
@@ -16,7 +19,7 @@ async function loadNowPlayingPrograms() {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = await response.json();
         programsList = (Array.isArray(data.programs) ? data.programs : [])
-            .map(program => ({ ...program, artwork: program.artwork ? resolveAppAsset(program.artwork) : "" }));
+            .map(program => ({ ...program, artwork: program.artwork ? resolveNowPlayingAsset(program.artwork) : "" }));
         console.log("Catálogo de programas cargado:", programsList.length);
     } catch (err) {
         console.error("No se pudo cargar el catálogo de programas:", err);
