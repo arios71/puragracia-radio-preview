@@ -1,3 +1,4 @@
+
 // js/nowplaying.js
 const nowPlayingBox = document.getElementById("nowPlayingBox");
 const NOWPLAYING_APP_BASE = new URL("./", document.baseURI);
@@ -30,6 +31,23 @@ function updateNowPlaying(metadata) {
     if (!nowPlayingBox) {
         console.error("No existe #nowPlayingBox en el documento.");
         return;
+    }
+
+    // No sustituir la metadata visible mientras suena un elemento de producción.
+    // Se conserva también la carátula que ya estaba mostrándose.
+    if (metadata?.isProduction) {
+        if (currentTrack !== null) {
+            console.log("Elemento de producción: se conserva la metadata anterior.");
+            return;
+        }
+
+        // Si la PWA se abre mientras suena producción, no mostrar el nombre del archivo.
+        metadata = {
+            title: "Pura Gracia Radio",
+            artist: SLOGAN,
+            album: "",
+            coverArt: ""
+        };
     }
 
     let title = asText(metadata?.title) || "Pura Gracia Radio";
