@@ -516,3 +516,10 @@ main.app {
 .menu-item span { font-size: 9px; }
 @media (min-width: 700px) { #articulos.section.active { padding: 38px 24px 100px; } .article-list-card { padding: 21px 23px; } }
 @media (max-width: 360px) { .menu-item i { font-size: 18px; } .menu-item span { font-size: 8px; } }
+
+/* Imágenes y resumen de artículos publicados desde Supabase */
+.article-list-cover{width:100%;max-height:190px;aspect-ratio:16/9;object-fit:cover;border-radius:10px;margin-bottom:4px}
+.article-list-excerpt{color:#c1cbd5;font-size:.82rem;line-height:1.5}
+.article-cover{display:block;width:100%;max-height:390px;object-fit:cover;border-radius:12px;margin:22px 0}
+.article-excerpt{font-size:1.03rem;font-style:italic;color:#5b5143;margin:20px 0}
+.article-body a,.article-scripture-intro a{color:#245d91;text-decoration:underline;text-underline-offset:2px;pointer-events:auto}
