@@ -181,7 +181,9 @@
     $('coverAlt').value = data.cover_image_alt || '';
     const readOnly = currentRole === 'publisher' || (currentRole === 'editor' && data.status === 'published');
     setReadOnly(readOnly);
-    $('publishBtn').hidden = currentRole === 'editor' || data.status === 'published' && currentRole === 'publisher';
+    $('publishBtn').hidden = currentRole === 'editor' || (data.status === 'published' && currentRole === 'publisher');
+    $('unpublishBtn').hidden = data.status !== 'published' || !['admin','publisher'].includes(currentRole);
+    $('deleteArticleBtn').hidden = currentRole !== 'admin';
     $('saveDraftBtn').hidden = currentRole === 'publisher';
     $('saveStatus').textContent = statusText(data.status) + ' · ' + (data.updated_at ? new Date(data.updated_at).toLocaleString('es-PR') : '');
     document.querySelectorAll('.admin-article-item').forEach(b => b.classList.toggle('active',b.dataset.id===id));
@@ -206,6 +208,8 @@
     setReadOnly(currentRole === 'publisher');
     $('saveDraftBtn').hidden = currentRole === 'publisher';
     $('publishBtn').hidden = currentRole === 'editor';
+    $('unpublishBtn').hidden = true;
+    $('deleteArticleBtn').hidden = true;
     $('saveStatus').textContent = 'Nuevo artículo';
     document.querySelectorAll('.admin-article-item').forEach(b => b.classList.remove('active'));
     lastLocalFingerprint = JSON.stringify(editorSnapshot());
@@ -287,6 +291,32 @@
     await loadArticle(id);
   }
 
+  async function unpublishArticle() {
+    const id = $('articleId').value;
+    if (!id) throw new Error('Selecciona primero un artículo publicado.');
+    if (!confirm('¿Despublicar este artículo? Dejará de aparecer en la PWA, pero seguirá guardado como borrador en Supabase.')) return;
+    const { error } = await client.rpc('unpublish_article', { article_id: id });
+    if (error) throw error;
+    clearLocalBackup();
+    message('Artículo despublicado. Se conserva como borrador y ya no debe aparecer en la PWA.');
+    await loadArticles();
+    await loadArticle(id);
+  }
+
+  async function deleteArticle() {
+    const id = $('articleId').value;
+    if (!id) throw new Error('Selecciona primero el artículo que deseas eliminar.');
+    const title = $('articleTitle').value.trim() || 'este artículo';
+    if (!confirm('ELIMINACIÓN DEFINITIVA\n\n¿Eliminar «' + title + '» de Supabase? Esta acción no se puede deshacer y el artículo desaparecerá del panel y de la PWA.')) return;
+    if (!confirm('Última confirmación: ¿quieres borrar definitivamente este artículo?')) return;
+    const { error } = await client.rpc('delete_article', { article_id: id });
+    if (error) throw error;
+    try { localStorage.removeItem('pgr-editor-recovery:' + currentUser.id + ':' + id); } catch (_) {}
+    resetForm();
+    message('Artículo eliminado definitivamente.');
+    await loadArticles();
+  }
+
   async function loadUsers() {
     const { data, error } = await client.from('profiles').select('id,email,role').order('email');
     if (error) { $('adminUserList').innerHTML = '<p class="muted small">No se pudieron cargar los colaboradores.</p>'; return; }
@@ -350,6 +380,8 @@
     $('insertBibleBtn').addEventListener('click',insertBibleReference);
     $('saveDraftBtn').addEventListener('click',async()=>{try{await saveDraft();}catch(e){message(e.message||'No se pudo guardar.',true);}});
     $('publishBtn').addEventListener('click',async()=>{try{await publishArticle();}catch(e){message(e.message||'No se pudo publicar.',true);}});
+    $('unpublishBtn').addEventListener('click',async()=>{try{await unpublishArticle();}catch(e){message(e.message||'No se pudo despublicar.',true);}});
+    $('deleteArticleBtn').addEventListener('click',async()=>{try{await deleteArticle();}catch(e){message(e.message||'No se pudo eliminar el artículo.',true);}});
     $('previewBtn').addEventListener('click',()=>{
       const title=escapeHtml($('articleTitle').value||'Artículo sin título');
       const author=escapeHtml($('articleAuthor').value);
