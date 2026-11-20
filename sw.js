@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pgr-preview-v9';
+const CACHE_NAME = 'pgr-preview-v10';
 const APP_BASE = new URL('./', self.location.href);
 const STATIC_ASSETS = [
   '',
