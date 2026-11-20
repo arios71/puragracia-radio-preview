@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#0a0f1a">
+  <title>Panel editorial | Pura Gracia Radio</title>
+  <link rel="icon" href="./assets/icons/logo-32.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="./css/admin.css">
+</head>
+<body class="admin-body">
+  <header class="admin-topbar">
+    <a class="admin-brand" href="./index.html"><img src="./assets/branding/logo-horizontal.webp" alt="Pura Gracia Radio"></a>
+    <div class="admin-top-actions">
+      <span id="sessionEmail" class="session-email"></span>
+      <button id="signOutBtn" class="button button-quiet" hidden><i class="fa-solid fa-arrow-right-from-bracket"></i> Salir</button>
+    </div>
+  </header>
+
+  <main class="admin-shell">
+    <section id="loginPanel" class="login-panel">
+      <div class="panel-kicker">WRPG-DB · ÁREA PRIVADA</div>
+      <h1>Panel editorial</h1>
+      <p>Acceso exclusivo para el equipo autorizado de Pura Gracia Radio.</p>
+      <form id="loginForm" class="login-form">
+        <label>Correo electrónico<input id="loginEmail" type="email" autocomplete="username" required></label>
+        <label>Contraseña<input id="loginPassword" type="password" autocomplete="current-password" required></label>
+        <button class="button button-primary" type="submit">Entrar <i class="fa-solid fa-arrow-right"></i></button>
+        <p id="loginMessage" class="form-message" role="status"></p>
+      </form>
+    </section>
+
+    <section id="editorPanel" hidden>
+      <div class="admin-heading">
+        <div><div class="panel-kicker">PUBLICACIONES</div><h1>Administrar artículos</h1><p>Redacta, revisa y publica contenido para la PWA.</p></div>
+        <button id="newArticleBtn" class="button button-primary"><i class="fa-solid fa-plus"></i> Nuevo artículo</button>
+      </div>
+
+      <div class="admin-layout">
+        <aside class="article-sidebar">
+          <div class="sidebar-title">Artículos <button id="refreshArticlesBtn" class="icon-button" title="Actualizar"><i class="fa-solid fa-rotate"></i></button></div>
+          <div id="adminArticleList" class="admin-article-list"><p class="muted">Cargando…</p></div>
+          <div id="userManagement" class="user-management" hidden>
+            <div class="sidebar-title">Colaboradores</div>
+            <p class="muted small">Cambia el rol de los usuarios que ya tengan una cuenta autorizada.</p>
+            <div id="adminUserList"></div>
+          </div>
+        </aside>
+
+        <section class="editor-card">
+          <form id="articleForm">
+            <input type="hidden" id="articleId">
+            <div class="form-grid">
+              <label class="field field-wide">Título del artículo<input id="articleTitle" maxlength="180" required placeholder="Escribe el título"></label>
+              <label>Autor<input id="articleAuthor" value="Antolín Maldonado Ríos" required></label>
+              <label>Categoría<input id="articleCategory" placeholder="Reflexión bíblica"></label>
+              <label>Fecha del artículo<input id="articleDate" type="date" required></label>
+              <label class="field field-wide">Resumen breve<textarea id="articleExcerpt" rows="2" maxlength="300" placeholder="Una breve descripción para la lista de artículos"></textarea></label>
+            </div>
+
+            <div class="cover-upload">
+              <div><strong>Imagen principal</strong><p class="muted small">Opcional. JPG, PNG o WebP.</p></div>
+              <label class="button button-outline upload-button"><i class="fa-solid fa-image"></i> Añadir fotografía<input id="coverImageInput" type="file" accept="image/jpeg,image/png,image/webp" hidden></label>
+              <img id="coverPreview" class="cover-preview" alt="Vista previa de la imagen principal" hidden>
+              <button id="removeCoverBtn" class="text-button" type="button" hidden>Quitar imagen</button>
+            </div>
+            <label class="alt-field">Texto alternativo de la imagen<input id="coverAlt" maxlength="180" placeholder="Describe brevemente la imagen"></label>
+
+            <div class="content-label"><strong>Contenido del artículo</strong><span class="muted small">El área de escritura tiene fondo claro para facilitar la lectura.</span></div>
+            <div class="toolbar" role="toolbar" aria-label="Formato del texto">
+              <button type="button" data-command="bold" title="Negrita"><b>B</b></button>
+              <button type="button" data-command="italic" title="Cursiva"><i>I</i></button>
+              <button type="button" data-command="underline" title="Subrayado"><u>U</u></button>
+              <span class="toolbar-divider"></span>
+              <button type="button" data-command="formatBlock" data-value="h2" title="Subtítulo">H2</button>
+              <button type="button" data-command="formatBlock" data-value="h3" title="Encabezado menor">H3</button>
+              <button type="button" data-command="formatBlock" data-value="blockquote" title="Cita"><i class="fa-solid fa-quote-left"></i></button>
+              <button type="button" data-command="insertUnorderedList" title="Viñetas"><i class="fa-solid fa-list-ul"></i></button>
+              <button type="button" data-command="insertOrderedList" title="Lista numerada"><i class="fa-solid fa-list-ol"></i></button>
+              <span class="toolbar-divider"></span>
+              <button type="button" id="insertLinkBtn" title="Insertar enlace"><i class="fa-solid fa-link"></i></button>
+              <button type="button" id="insertBibleBtn" title="Insertar referencia bíblica"><i class="fa-solid fa-book-bible"></i></button>
+              <button type="button" id="insertImageBtn" title="Insertar fotografía en el texto"><i class="fa-solid fa-image"></i></button>
+              <input id="inlineImageInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+              <span class="toolbar-spacer"></span>
+              <button type="button" data-command="undo" title="Deshacer"><i class="fa-solid fa-rotate-left"></i></button>
+              <button type="button" data-command="redo" title="Rehacer"><i class="fa-solid fa-rotate-right"></i></button>
+            </div>
+            <div id="articleContent" class="rich-editor" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="Comienza a escribir tu artículo aquí…"></div>
+            <p class="editor-hint">Selecciona una palabra o frase para aplicar formato o convertirla en enlace. Las referencias bíblicas pueden enlazarse a YouVersion.</p>
+
+            <div class="editor-footer">
+              <span id="saveStatus" class="save-status" role="status">Cambios sin guardar</span>
+              <div class="editor-actions">
+                <button id="previewBtn" class="button button-outline" type="button"><i class="fa-regular fa-eye"></i> Vista previa</button>
+                <button id="saveDraftBtn" class="button button-outline" type="button"><i class="fa-regular fa-floppy-disk"></i> Guardar borrador</button>
+                <button id="publishBtn" class="button button-primary" type="button"><i class="fa-solid fa-paper-plane"></i> Publicar</button>
+              </div>
+            </div>
+            <p id="editorMessage" class="form-message" role="status"></p>
+          </form>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="previewDialog" class="preview-dialog">
+    <div class="preview-dialog-head"><strong>Vista previa del artículo</strong><button id="closePreviewBtn" class="icon-button" type="button" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button></div>
+    <article id="previewArticle" class="preview-article"></article>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./js/supabase-config.js"></script>
+  <script src="./js/admin.js"></script>
+</body>
+</html>
