@@ -58,7 +58,7 @@ module.exports = async function handler(req, res) {
     const title = article.title || "Artículo de Pura Gracia Radio";
     const description = article.excerpt || "Lee este artículo de Pura Gracia Radio: música y contenido en sintonía con el evangelio de Cristo.";
     const image = absoluteUrl(article.cover_image_url || DEFAULT_IMAGE);
-    const canonical = PWA_URL + "?articulo=" + encodeURIComponent(article.slug || article.id);
+    const canonical = PWA_URL + "?articulo=" + encodeURIComponent(article.slug || article.id) + "#articulos";
     const shareUrl = "https://puragracia-radio-preview-vercel-pre.vercel.app/api/article-share?article=" + encodeURIComponent(article.slug || article.id);
 
     const html = `<!doctype html>
