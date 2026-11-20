@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pgr-preview-v6';
+const CACHE_NAME = 'pgr-preview-v7';
 const APP_BASE = new URL('./', self.location.href);
 const STATIC_ASSETS = [
   '',
@@ -53,6 +53,9 @@ self.addEventListener('fetch', event => {
   ) return;
 
   if (event.request.method !== 'GET') return;
+
+  // El panel editorial debe consultar siempre sus archivos más recientes.
+  if (/\/(admin\.html|js\/admin\.js|css\/admin\.css)$/.test(url.pathname)) return;
 
   if (url.pathname.endsWith('/data/articles.json') || url.pathname.includes('/articles/')) {
     event.respondWith(fetch(event.request).then(response => {
