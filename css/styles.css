@@ -589,3 +589,23 @@ main.app {
     font-size: 1.1rem;
   }
 }
+
+
+/* Compartir artículo */
+.article-share {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin: 0 0 18px 10px;
+  padding: 9px 15px;
+  border: 1px solid rgba(213,166,74,.4);
+  border-radius: 22px;
+  background: rgba(213,166,74,.1);
+  color: #edc779;
+  font: inherit;
+  font-size: .82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.article-share:active { transform: scale(.98); }
