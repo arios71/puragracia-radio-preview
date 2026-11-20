@@ -147,7 +147,7 @@
         <strong>${escapeHtml(a.title)}</strong>
         <span>${escapeHtml(statusText(a.status))} · ${escapeHtml(a.article_date || '')}</span>
       </button>`).join('') : '<p class="muted small">Todavía no hay artículos en Supabase.</p>';
-    $('adminArticleList').querySelectorAll('[data-id]').forEach(button => button.addEventListener('click', () => loadArticle(button.dataset.id)));
+    $('adminArticleList').querySelectorAll('[data-id]').forEach(button => button.addEventListener('click', () => { saveLocalBackup(); loadArticle(button.dataset.id); }));
   }
 
   async function loadArticle(id) {
