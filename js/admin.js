@@ -34,6 +34,16 @@
     try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : null; }
     catch (_) { return null; }
   }
+  function snapshotFingerprint(data = editorSnapshot()) {
+    const { savedAt, ...stableData } = data;
+    return JSON.stringify(stableData);
+  }
+  let localSaveDebounce = null;
+  function scheduleLocalBackup() {
+    $('saveStatus').textContent = 'Cambios pendientes de copia local…';
+    if (localSaveDebounce) clearTimeout(localSaveDebounce);
+    localSaveDebounce = setTimeout(saveLocalBackup, 900);
+  }
   function editorSnapshot() {
     return {
       articleId: $('articleId').value || '',
@@ -72,7 +82,7 @@
       return false;
     }
     applySnapshot(backup);
-    lastLocalFingerprint = JSON.stringify(editorSnapshot());
+    lastLocalFingerprint = snapshotFingerprint();
     $('saveStatus').textContent = 'Copia local recuperada · guarda el borrador en Supabase';
     message('Se recuperó la última copia local. Todavía debes guardar el borrador en Supabase.');
     return true;
@@ -83,10 +93,10 @@
     const meaningful = data.title.trim() || data.content.trim() || data.excerpt.trim();
     if (!meaningful) return;
     const fingerprint = JSON.stringify(data);
-    if (fingerprint === lastLocalFingerprint) return;
+    if (snapshotFingerprint(data) === lastLocalFingerprint) return;
     try {
       localStorage.setItem(localKey(), JSON.stringify(data));
-      lastLocalFingerprint = fingerprint;
+      lastLocalFingerprint = snapshotFingerprint(data);
       $('saveStatus').textContent = 'Copia local guardada · ' + new Date().toLocaleTimeString('es-PR');
     } catch (_) {
       $('saveStatus').textContent = 'No se pudo guardar la copia local';
@@ -352,7 +362,7 @@
     // El intervalo cubre el cierre accidental; estos eventos también actualizan el indicador.
     ['articleTitle','articleAuthor','articleCategory','articleDate','articleExcerpt','coverAlt'].forEach(id =>
       $(id).addEventListener('input',()=>{ $('saveStatus').textContent='Cambios pendientes de copia local…'; }));
-    $('articleContent').addEventListener('input',()=>{ $('saveStatus').textContent='Cambios pendientes de copia local…'; });
+    $('articleContent').addEventListener('input',scheduleLocalBackup);
     window.addEventListener('pagehide',saveLocalBackup);
     window.addEventListener('beforeunload',saveLocalBackup);
   }
