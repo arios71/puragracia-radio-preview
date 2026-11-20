@@ -27,6 +27,76 @@
   const message = (text, error=false) => { $('editorMessage').textContent = text; $('editorMessage').style.color = error ? '#f0a0a0' : '#edc779'; };
   const statusText = status => status === 'published' ? 'Publicado' : 'Borrador';
 
+  // Copia de seguridad local independiente de Supabase.
+  let autosaveTimer = null, lastLocalFingerprint = '';
+  const localKey = () => currentUser ? 'pgr-editor-recovery:' + currentUser.id + ':' + ($('articleId').value || 'new') : null;
+  function readLocalBackup(key) {
+    try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : null; }
+    catch (_) { return null; }
+  }
+  function editorSnapshot() {
+    return {
+      articleId: $('articleId').value || '',
+      title: $('articleTitle').value,
+      author: $('articleAuthor').value,
+      category: $('articleCategory').value,
+      date: $('articleDate').value,
+      excerpt: $('articleExcerpt').value,
+      content: $('articleContent').innerHTML,
+      coverUrl,
+      coverAlt: $('coverAlt').value,
+      savedAt: new Date().toISOString()
+    };
+  }
+  function applySnapshot(data) {
+    $('articleId').value = data.articleId || '';
+    $('articleTitle').value = data.title || '';
+    $('articleAuthor').value = data.author || '';
+    $('articleCategory').value = data.category || '';
+    $('articleDate').value = data.date || localDate();
+    $('articleExcerpt').value = data.excerpt || '';
+    $('articleContent').innerHTML = data.content || '';
+    coverUrl = data.coverUrl || null;
+    coverPath = null;
+    $('coverPreview').src = coverUrl || '';
+    $('coverPreview').hidden = !coverUrl;
+    $('removeCoverBtn').hidden = !coverUrl;
+    $('coverAlt').value = data.coverAlt || '';
+  }
+  function recoverLocalBackup(key) {
+    const backup = readLocalBackup(key);
+    if (!backup) return false;
+    const when = new Date(backup.savedAt).toLocaleString('es-PR');
+    if (!confirm('Encontré una copia local de este artículo guardada el ' + when + '. ¿Deseas recuperarla?')) {
+      try { localStorage.removeItem(key); } catch (_) {}
+      return false;
+    }
+    applySnapshot(backup);
+    lastLocalFingerprint = JSON.stringify(editorSnapshot());
+    $('saveStatus').textContent = 'Copia local recuperada · guarda el borrador en Supabase';
+    message('Se recuperó la última copia local. Todavía debes guardar el borrador en Supabase.');
+    return true;
+  }
+  function saveLocalBackup() {
+    if (!currentUser || $('editorPanel').hidden || currentRole === 'publisher') return;
+    const data = editorSnapshot();
+    const meaningful = data.title.trim() || data.content.trim() || data.excerpt.trim();
+    if (!meaningful) return;
+    const fingerprint = JSON.stringify(data);
+    if (fingerprint === lastLocalFingerprint) return;
+    try {
+      localStorage.setItem(localKey(), JSON.stringify(data));
+      lastLocalFingerprint = fingerprint;
+      $('saveStatus').textContent = 'Copia local guardada · ' + new Date().toLocaleTimeString('es-PR');
+    } catch (_) {
+      $('saveStatus').textContent = 'No se pudo guardar la copia local';
+    }
+  }
+  function clearLocalBackup() {
+    try { if (localKey()) localStorage.removeItem(localKey()); } catch (_) {}
+    lastLocalFingerprint = JSON.stringify(editorSnapshot());
+  }
+
   async function boot() {
     const { data: { session } } = await client.auth.getSession();
     if (session) await showEditor(session.user);
@@ -63,6 +133,8 @@
     await loadArticles();
     if (currentRole === 'admin') await loadUsers();
     resetForm();
+    recoverLocalBackup(localKey());
+    autosaveTimer = setInterval(saveLocalBackup, 5000);
   }
 
   async function loadArticles() {
@@ -81,6 +153,9 @@
   async function loadArticle(id) {
     const { data, error } = await client.from('articles').select('*').eq('id',id).single();
     if (error || !data) { message('No fue posible abrir el artículo.',true); return; }
+    const backupKey = 'pgr-editor-recovery:' + currentUser.id + ':' + data.id;
+    const recovered = recoverLocalBackup(backupKey);
+    if (recovered) { setReadOnly(currentRole === 'publisher' || (currentRole === 'editor' && data.status === 'published')); return; }
     $('articleId').value = data.id;
     $('articleTitle').value = data.title || '';
     $('articleAuthor').value = data.author || '';
@@ -123,6 +198,7 @@
     $('publishBtn').hidden = currentRole === 'editor';
     $('saveStatus').textContent = 'Nuevo artículo';
     document.querySelectorAll('.admin-article-item').forEach(b => b.classList.remove('active'));
+    lastLocalFingerprint = JSON.stringify(editorSnapshot());
     message('');
   }
 
@@ -176,7 +252,8 @@
     }
     if (result.error) throw result.error;
     $('articleId').value = result.data.id;
-    $('saveStatus').textContent = 'Borrador guardado';
+    $('saveStatus').textContent = 'Borrador guardado en Supabase';
+    clearLocalBackup();
     message('Borrador guardado correctamente.');
     await loadArticles();
     return result.data.id;
@@ -239,7 +316,7 @@
   }
 
   function bindEditor() {
-    $('newArticleBtn').addEventListener('click',resetForm);
+    $('newArticleBtn').addEventListener('click',()=>{ saveLocalBackup(); resetForm(); recoverLocalBackup(localKey()); });
     $('refreshArticlesBtn').addEventListener('click',loadArticles);
     $('coverImageInput').addEventListener('change',e=>{if(e.target.files[0])handleCover(e.target.files[0]);e.target.value='';});
     $('removeCoverBtn').addEventListener('click',()=>{coverUrl=null;coverPath=null;$('coverPreview').hidden=true;$('removeCoverBtn').hidden=true;});
@@ -270,6 +347,12 @@
       $('previewDialog').showModal();
     });
     $('closePreviewBtn').addEventListener('click',()=>$('previewDialog').close());
+    // El intervalo cubre el cierre accidental; estos eventos también actualizan el indicador.
+    ['articleTitle','articleAuthor','articleCategory','articleDate','articleExcerpt','coverAlt'].forEach(id =>
+      $(id).addEventListener('input',()=>{ $('saveStatus').textContent='Cambios pendientes de copia local…'; }));
+    $('articleContent').addEventListener('input',()=>{ $('saveStatus').textContent='Cambios pendientes de copia local…'; });
+    window.addEventListener('pagehide',saveLocalBackup);
+    window.addEventListener('beforeunload',saveLocalBackup);
   }
 
   boot();
