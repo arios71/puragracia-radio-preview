@@ -77,6 +77,22 @@
     <div id="sermons-archive-list" style="max-width: 600px; margin: 0 auto; width: 100%; box-sizing: border-box; display: flex; flex-direction: column;"></div>
 </section>
 
+
+
+        <section id="articulos" class="section">
+            <div class="articles-block">
+                <div class="articles-heading">
+                    <span>LECTURAS</span>
+                    <h2>Artículos</h2>
+                    <p>Reflexiones y contenido para edificar tu fe.</p>
+                </div>
+                <div id="articleListView" class="article-list-view">
+                    <p class="article-loading">Cargando artículos…</p>
+                </div>
+                <div id="articleReaderView" class="article-reader-view" hidden></div>
+            </div>
+        </section>
+
         <section id="contacto" class="section">
     <div class="contact-block">
         <div class="contact-card">
@@ -129,6 +145,10 @@
     <i class="fas fa-microphone-lines"></i>
     <span>Sermones</span>
   </a>
+  <a href="#" data-section="articulos" class="menu-item">
+    <i class="fas fa-book-open"></i>
+    <span>Artículos</span>
+  </a>
   <a href="#" data-section="contacto" class="menu-item">
     <i class="fas fa-envelope"></i>
     <span>Contacto</span>
@@ -140,6 +160,7 @@
     <script src="./js/menu.js"></script>
     <script src="./js/nowplaying.js?v=20261107-1"></script>
     <script src="./js/sermones.js"></script>
+    <script src="./js/articles.js"></script>
 
     <script>
       if ('serviceWorker' in navigator) {
