@@ -81,7 +81,7 @@ module.exports = async function handler(req, res) {
 <meta name="twitter:title" content="${escapeHtml(title)}">
 <meta name="twitter:description" content="${escapeHtml(description)}">
 <meta name="twitter:image" content="${escapeHtml(image)}">
-<meta http-equiv="refresh" content="0;url=${escapeHtml(canonical)}">
+
 </head>
 <body>
 <p>Abriendo el artículo en Pura Gracia Radio…</p>
