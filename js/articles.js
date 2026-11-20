@@ -1,5 +1,4 @@
-// Catálogo público: combina los artículos publicados en Supabase con el artículo
-// estático histórico que ya formaba parte de esta PWA.
+// Catálogo público: combina los artículos publicados en Supabase con el catálogo estático histórico.
 (() => {
   const listView = document.getElementById('articleListView');
   const readerView = document.getElementById('articleReaderView');
@@ -23,15 +22,14 @@
     readerView.innerHTML = '';
   }
 
+  // Índice editorial compacto: título, autor y fecha. La portada y el resumen
+  // se reservan para la vista de lectura para evitar repetir contenido.
   function renderList() {
     const sorted = [...articles].sort((a,b) => String(b.date || '').localeCompare(String(a.date || '')));
     listView.innerHTML = sorted.length ? sorted.map(article => `
-      <button class="article-list-card" type="button" data-article-id="${escapeHtml(article.id)}">
-        ${article.cover ? '<img class="article-list-cover" src="'+escapeHtml(article.cover)+'" alt="'+escapeHtml(article.coverAlt || '')+'" loading="lazy">' : ''}
-        <span class="article-list-category">${escapeHtml(article.category || 'Artículo')}</span>
+      <button class="article-list-card" type="button" data-article-id="${escapeHtml(article.id)}" aria-label="Leer: ${escapeHtml(article.title)}">
         <strong>${escapeHtml(article.title)}</strong>
-        ${article.excerpt ? '<span class="article-list-excerpt">'+escapeHtml(article.excerpt)+'</span>' : ''}
-        <span class="article-list-meta">${escapeHtml(article.dateLabel || dateLabel(article.date))} · ${escapeHtml(article.author)}</span>
+        <span class="article-list-meta">${escapeHtml(article.author)}${article.author && (article.dateLabel || article.date) ? ' · ' : ''}${escapeHtml(article.dateLabel || dateLabel(article.date))}</span>
         <span class="article-list-open">Leer artículo <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
       </button>`).join('') : '<p class="articles-empty">Próximamente compartiremos nuevos artículos.</p>';
   }
@@ -66,7 +64,6 @@
         if (!response.ok) throw new Error('No se pudo cargar el artículo');
         const markup = await response.text();
         const parsed = new DOMParser().parseFromString(markup,'text/html');
-        // Los enlaces existentes se conservan; ya no se eliminan del contenido.
         readerView.innerHTML = '<button class="article-back" type="button"><i class="fas fa-arrow-left" aria-hidden="true"></i> Todos los artículos</button>'+DOMPurify.sanitize(parsed.body.innerHTML,{USE_PROFILES:{html:true},ADD_ATTR:['target','rel']});
       }
       readerView.querySelector('.article-back')?.addEventListener('click',showList);
