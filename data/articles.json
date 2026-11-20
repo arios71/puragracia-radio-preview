@@ -1,13 +1,3 @@
 {
-  "articles": [
-    {
-      "id": "morir-a-la-carne",
-      "title": "Morir a la carne quita el temor a la muerte",
-      "author": "Antolín Maldonado Ríos",
-      "date": "2026-11-18",
-      "dateLabel": "18 de noviembre de 2026",
-      "category": "Reflexión bíblica",
-      "file": "articles/2026-11-18-morir-a-la-carne.html"
-    }
-  ]
+  "articles": []
 }
