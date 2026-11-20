@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pgr-preview-v4';
+const CACHE_NAME = 'pgr-preview-v5';
 const APP_BASE = new URL('./', self.location.href);
 const STATIC_ASSETS = [
   '',
@@ -9,6 +9,9 @@ const STATIC_ASSETS = [
   'js/nowplaying.js',
   'js/schedule.js',
   'js/sermones.js',
+  'js/articles.js',
+  'data/articles.json',
+  'articles/2026-11-18-morir-a-la-carne.html',
   'manifest.json',
   'assets/branding/logo-horizontal.webp',
   'default-cover.png',
@@ -49,6 +52,16 @@ self.addEventListener('fetch', event => {
   ) return;
 
   if (event.request.method !== 'GET') return;
+
+  if (url.pathname.endsWith('/data/articles.json') || url.pathname.includes('/articles/')) {
+    event.respondWith(fetch(event.request).then(response => {
+      if (response.ok) { const copy = response.clone(); caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy)); }
+      return response;
+    }).catch(() => caches.match(event.request)));
+    return;
+  }
+
+
 
   if (event.request.mode === 'navigate') {
     event.respondWith(
