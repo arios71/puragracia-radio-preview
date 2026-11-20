@@ -28,7 +28,16 @@
     window.history[method]({ article: article ? (article.slug || article.id) : null }, '', url);
   }
 
+  function activateArticlesSection() {
+    document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+    document.getElementById('articulos')?.classList.add('active');
+    document.querySelectorAll('nav a[data-section]').forEach(link => {
+      link.classList.toggle('active', link.getAttribute('data-section') === 'articulos');
+    });
+  }
+
   function showList(updateUrl = true) {
+    activateArticlesSection();
     readerView.hidden = true;
     listView.hidden = false;
     readerView.innerHTML = '';
@@ -122,6 +131,7 @@
     const article = articles.find(item => item.id === id || item.slug === id);
     if (!article) return;
     if (updateUrl) updateArticleUrl(article);
+    activateArticlesSection();
     readerView.hidden = false;
     listView.hidden = true;
     readerView.innerHTML = '<p class="article-loading">Cargando artículo…</p>';
@@ -187,7 +197,10 @@
     articles = [...databaseArticles,...staticFallback];
     renderList();
     const requestedArticle = new URL(window.location.href).searchParams.get('articulo');
-    if (requestedArticle) openArticle(requestedArticle, false);
+    if (requestedArticle) {
+      activateArticlesSection();
+      openArticle(requestedArticle, false);
+    }
   }
 
   loadArticles();
