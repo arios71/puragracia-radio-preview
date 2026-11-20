@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pgr-preview-v5';
+const CACHE_NAME = 'pgr-preview-v6';
 const APP_BASE = new URL('./', self.location.href);
 const STATIC_ASSETS = [
   '',
@@ -10,6 +10,7 @@ const STATIC_ASSETS = [
   'js/schedule.js',
   'js/sermones.js',
   'js/articles.js',
+  'js/supabase-config.js',
   'data/articles.json',
   'articles/2026-11-18-morir-a-la-carne.html',
   'manifest.json',
