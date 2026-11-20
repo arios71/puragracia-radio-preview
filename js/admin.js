@@ -368,10 +368,34 @@
       try{const uploaded=await uploadImage(file);insertAtCursor('<p><img src="'+uploaded.url+'" alt="'+escapeHtml(file.name.replace(/\.[^.]+$/,''))+'"></p>');}
       catch(error){message(error.message||'No se pudo insertar la imagen.',true);}
     });
-    document.querySelectorAll('.toolbar [data-command]').forEach(button=>button.addEventListener('click',()=>{
-      $('articleContent').focus();
-      document.execCommand(button.dataset.command,false,button.dataset.value||null);
-    }));
+    // Evita que el botón robe el foco y destruya la selección del editor.
+    document.querySelectorAll('.toolbar [data-command]').forEach(button=>{
+      button.addEventListener('mousedown',event=>event.preventDefault());
+      button.addEventListener('click',()=>{
+        const editor = $('articleContent');
+        editor.focus();
+        const command = button.dataset.command;
+        if (command === 'removeFormat') {
+          // Quita formato de caracteres, enlaces y formato de bloque (incluidas las citas).
+          document.execCommand('removeFormat',false,null);
+          document.execCommand('unlink',false,null);
+          document.execCommand('formatBlock',false,'<p>');
+          // Limpia estilos residuales dentro de la selección sin borrar el texto.
+          const selection = window.getSelection();
+          if (selection && selection.rangeCount) {
+            const node = selection.anchorNode;
+            const block = node && (node.nodeType === 1 ? node : node.parentElement)?.closest('blockquote');
+            if (block && editor.contains(block)) {
+              const paragraph = document.createElement('p');
+              while (block.firstChild) paragraph.appendChild(block.firstChild);
+              block.replaceWith(paragraph);
+            }
+          }
+          return;
+        }
+        document.execCommand(command,false,button.dataset.value||null);
+      });
+    });
     $('insertLinkBtn').addEventListener('click',()=>{
       const url=prompt('Introduce la dirección del enlace (https://…):');if(!url)return;
       if(!/^https?:\/\//i.test(url)){message('El enlace debe comenzar con https:// o http://',true);return;}
