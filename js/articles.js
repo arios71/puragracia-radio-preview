@@ -16,10 +16,78 @@
     return new Date(date + 'T12:00:00').toLocaleDateString('es-PR',{day:'numeric',month:'long',year:'numeric'});
   }
 
-  function showList() {
+  function articleUrl(article) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('articulo', article.slug || article.id);
+    return url.href;
+  }
+
+  function updateArticleUrl(article, method = 'pushState') {
+    const url = new URL(window.location.href);
+    if (article) url.searchParams.set('articulo', article.slug || article.id);
+    else url.searchParams.delete('articulo');
+    window.history[method]({ article: article ? (article.slug || article.id) : null }, '', url);
+  }
+
+  function showList(updateUrl = true) {
     readerView.hidden = true;
     listView.hidden = false;
     readerView.innerHTML = '';
+    if (updateUrl && new URL(window.location.href).searchParams.has('articulo')) {
+      updateArticleUrl(null, 'replaceState');
+    }
+  }
+
+  function shareControl() {
+    return '<button class="article-share" type="button"><i class="fas fa-share-nodes" aria-hidden="true"></i> Compartir artículo</button>';
+  }
+
+  async function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+    const field = document.createElement('textarea');
+    field.value = text;
+    field.setAttribute('readonly', '');
+    field.style.position = 'fixed';
+    field.style.opacity = '0';
+    document.body.appendChild(field);
+    field.select();
+    const copied = document.execCommand('copy');
+    field.remove();
+    if (!copied) throw new Error('No fue posible copiar el enlace');
+  }
+
+  async function shareArticle(article) {
+    const url = articleUrl(article);
+    const shareData = { title: article.title, text: 'Te comparto este artículo de Pura Gracia Radio.', url };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await copyText(url);
+        showShareCopied();
+      }
+    } catch (error) {
+      if (error?.name === 'AbortError') return;
+      try {
+        await copyText(url);
+        showShareCopied();
+      } catch (_) {
+        window.alert('No fue posible compartir automáticamente. Puedes copiar este enlace: ' + url);
+      }
+    }
+  }
+
+  function showShareCopied() {
+    const button = readerView.querySelector('.article-share');
+    if (button) button.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Enlace copiado';
+  }
+
+  function attachReaderControls(article) {
+    readerView.querySelector('.article-back')?.addEventListener('click', () => showList());
+    readerView.querySelector('.article-share')?.addEventListener('click', () => shareArticle(article));
   }
 
   // Índice editorial compacto: título, autor y fecha. La portada y el resumen
@@ -38,6 +106,7 @@
     const cover = article.cover ? '<img class="article-cover" src="'+escapeHtml(article.cover)+'" alt="'+escapeHtml(article.coverAlt || '')+'">' : '';
     return `
       <button class="article-back" type="button"><i class="fas fa-arrow-left" aria-hidden="true"></i> Todos los artículos</button>
+      ${shareControl()}
       <article class="article-full">
         <header class="article-full-header">
           <span class="article-category">${escapeHtml(article.category || 'ARTÍCULO')}</span>
@@ -50,9 +119,10 @@
       </article>`;
   }
 
-  async function openArticle(id) {
-    const article = articles.find(item => item.id === id);
+  async function openArticle(id, updateUrl = true) {
+    const article = articles.find(item => item.id === id || item.slug === id);
     if (!article) return;
+    if (updateUrl) updateArticleUrl(article);
     readerView.hidden = false;
     listView.hidden = true;
     readerView.innerHTML = '<p class="article-loading">Cargando artículo…</p>';
@@ -64,18 +134,25 @@
         if (!response.ok) throw new Error('No se pudo cargar el artículo');
         const markup = await response.text();
         const parsed = new DOMParser().parseFromString(markup,'text/html');
-        readerView.innerHTML = '<button class="article-back" type="button"><i class="fas fa-arrow-left" aria-hidden="true"></i> Todos los artículos</button>'+DOMPurify.sanitize(parsed.body.innerHTML,{USE_PROFILES:{html:true},ADD_ATTR:['target','rel']});
+        readerView.innerHTML = '<button class="article-back" type="button"><i class="fas fa-arrow-left" aria-hidden="true"></i> Todos los artículos</button>' +
+          shareControl() + DOMPurify.sanitize(parsed.body.innerHTML,{USE_PROFILES:{html:true},ADD_ATTR:['target','rel']});
       }
-      readerView.querySelector('.article-back')?.addEventListener('click',showList);
+      attachReaderControls(article);
     } catch (error) {
       readerView.innerHTML = '<button class="article-back" type="button"><i class="fas fa-arrow-left"></i> Todos los artículos</button><p class="article-error">No fue posible cargar este artículo. Inténtalo nuevamente.</p>';
-      readerView.querySelector('.article-back')?.addEventListener('click',showList);
+      attachReaderControls(article);
     }
   }
 
   listView.addEventListener('click',event => {
     const button = event.target.closest('[data-article-id]');
     if (button) openArticle(button.dataset.articleId);
+  });
+
+  window.addEventListener('popstate', () => {
+    const id = new URL(window.location.href).searchParams.get('articulo');
+    if (id) openArticle(id, false);
+    else showList(false);
   });
 
   async function loadArticles() {
@@ -110,6 +187,8 @@
     const staticFallback = staticArticles.filter(a => !databaseSlugs.has(a.id)).map(a => ({...a,dateLabel:a.dateLabel}));
     articles = [...databaseArticles,...staticFallback];
     renderList();
+    const requestedArticle = new URL(window.location.href).searchParams.get('articulo');
+    if (requestedArticle) openArticle(requestedArticle, false);
   }
 
   loadArticles();
