@@ -91,7 +91,7 @@
           .eq('status','published').order('article_date',{ascending:false});
         if (error) throw error;
         databaseArticles = (data || []).map(row => ({
-          id:row.id,title:row.title,author:row.author,date:row.article_date,
+          id:row.id,slug:row.slug,title:row.title,author:row.author,date:row.article_date,
           dateLabel:dateLabel(row.article_date),category:row.category,excerpt:row.excerpt,
           content:row.content_html,cover:row.cover_image_url,coverAlt:row.cover_image_alt
         }));
