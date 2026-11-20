@@ -1,5 +1,6 @@
 const ALLOWED_ORIGINS = new Set([
-  "https://arios71.github.io"
+  "https://arios71.github.io",
+  "https://puragracia-radio-migratio-git-89e603-antolins-projects-3931f532.vercel.app"
 ]);
 
 const PRODUCTION_FOLDERS = new Set([
