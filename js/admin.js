@@ -224,6 +224,7 @@
   }
 
   async function saveDraft() {
+    const previousBackupKey = localKey();
     if (currentRole === 'publisher') throw new Error('Tu rol permite publicar, pero no editar el contenido.');
     const title = $('articleTitle').value.trim();
     if (!title) throw new Error('Escribe el título del artículo.');
@@ -252,6 +253,7 @@
     }
     if (result.error) throw result.error;
     $('articleId').value = result.data.id;
+    try { if (previousBackupKey) localStorage.removeItem(previousBackupKey); } catch (_) {}
     $('saveStatus').textContent = 'Borrador guardado en Supabase';
     clearLocalBackup();
     message('Borrador guardado correctamente.');
