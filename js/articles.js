@@ -17,9 +17,8 @@
   }
 
   function articleUrl(article) {
-    const url = new URL(window.location.href);
-    url.searchParams.set('articulo', article.slug || article.id);
-    return url.href;
+    const key = article.slug || article.id;
+    return 'https://puragracia-radio-preview-vercel-pre.vercel.app/api/article-share?article=' + encodeURIComponent(key);
   }
 
   function updateArticleUrl(article, method = 'pushState') {
@@ -106,13 +105,13 @@
     const cover = article.cover ? '<img class="article-cover" src="'+escapeHtml(article.cover)+'" alt="'+escapeHtml(article.coverAlt || '')+'">' : '';
     return `
       <button class="article-back" type="button"><i class="fas fa-arrow-left" aria-hidden="true"></i> Todos los artículos</button>
-      ${shareControl()}
       <article class="article-full">
         <header class="article-full-header">
           <span class="article-category">${escapeHtml(article.category || 'ARTÍCULO')}</span>
           <h2>${escapeHtml(article.title)}</h2>
           <div class="article-byline"><time datetime="${escapeHtml(article.date)}">${escapeHtml(article.dateLabel || dateLabel(article.date))}</time><span>Por ${escapeHtml(article.author)}</span></div>
         </header>
+        ${shareControl()}
         ${cover}
         ${article.excerpt ? '<p class="article-excerpt">'+escapeHtml(article.excerpt)+'</p>' : ''}
         <div class="article-body">${DOMPurify.sanitize(article.content || '',{USE_PROFILES:{html:true},ADD_ATTR:['target','rel']})}</div>
@@ -135,7 +134,7 @@
         const markup = await response.text();
         const parsed = new DOMParser().parseFromString(markup,'text/html');
         readerView.innerHTML = '<button class="article-back" type="button"><i class="fas fa-arrow-left" aria-hidden="true"></i> Todos los artículos</button>' +
-          shareControl() + DOMPurify.sanitize(parsed.body.innerHTML,{USE_PROFILES:{html:true},ADD_ATTR:['target','rel']});
+          '<article class="article-full">' + shareControl() + DOMPurify.sanitize(parsed.body.innerHTML,{USE_PROFILES:{html:true},ADD_ATTR:['target','rel']}) + '</article>';
       }
       attachReaderControls(article);
     } catch (error) {
